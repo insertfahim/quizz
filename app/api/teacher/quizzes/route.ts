@@ -1,0 +1,120 @@
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/utils/connect";
+import { requireTeacher } from "@/utils/roles";
+
+// GET /api/teacher/quizzes - Get all quizzes created by the teacher
+export async function GET(req: NextRequest) {
+    try {
+        const teacher = await requireTeacher();
+
+        const quizzes = await prisma.quiz.findMany({
+            where: { creatorId: teacher.id },
+            include: {
+                category: true,
+                questions: {
+                    include: {
+                        options: true,
+                    },
+                },
+                submissions: {
+                    include: {
+                        user: {
+                            select: {
+                                name: true,
+                                email: true,
+                            },
+                        },
+                    },
+                },
+                _count: {
+                    select: {
+                        questions: true,
+                        submissions: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+
+        return NextResponse.json(quizzes);
+    } catch (error: any) {
+        console.error("Error fetching teacher quizzes:", error);
+        return NextResponse.json(
+            { error: error.message || "Error fetching quizzes" },
+            { status: error.message === "Teacher role required" ? 403 : 500 }
+        );
+    }
+}
+
+// POST /api/teacher/quizzes - Create a new quiz
+export async function POST(req: NextRequest) {
+    try {
+        const teacher = await requireTeacher();
+        const { title, description, categoryId, timeLimit, questions } = await req.json();
+
+        // Validate required fields
+        if (!title || !categoryId || !questions || questions.length === 0) {
+            return NextResponse.json(
+                { error: "Title, category, and at least one question are required" },
+                { status: 400 }
+            );
+        }
+
+        // Validate category exists
+        const category = await prisma.category.findUnique({
+            where: { id: categoryId },
+        });
+
+        if (!category) {
+            return NextResponse.json(
+                { error: "Category not found" },
+                { status: 404 }
+            );
+        }
+
+        // Create quiz with questions and options
+        const quiz = await prisma.quiz.create({
+            data: {
+                title,
+                description,
+                categoryId,
+                timeLimit,
+                creatorId: teacher.id,
+                questions: {
+                    create: questions.map((question: any) => ({
+                        text: question.text,
+                        type: question.type || "multiple_choice",
+                        difficulty: question.difficulty,
+                        explanation: question.explanation,
+                        options: {
+                            create: question.options || [],
+                        },
+                    })),
+                },
+            },
+            include: {
+                category: true,
+                questions: {
+                    include: {
+                        options: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        questions: true,
+                    },
+                },
+            },
+        });
+
+        return NextResponse.json(quiz, { status: 201 });
+    } catch (error: any) {
+        console.error("Error creating quiz:", error);
+        return NextResponse.json(
+            { error: error.message || "Error creating quiz" },
+            { status: error.message === "Teacher role required" ? 403 : 500 }
+        );
+    }
+}

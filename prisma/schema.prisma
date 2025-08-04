@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId       String   @unique
+  role          String   @default("student") // student, teacher
+  name          String?
+  email         String?
+  categoryStats CategoryStat[]
+  createdQuizzes Quiz[]  @relation("QuizCreator")
+  submissions   QuizSubmission[]
+}
+
+model Category{
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String   
+  description   String?
+  image         String?
+  quizzes       Quiz[]
+  categoryStats CategoryStat[] // reseve relation to CategoryStat
+}
+
+model Quiz {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  description     String?
+  image           String?
+  timeLimit       Int?      // Time limit in minutes
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  categoryId      String    @db.ObjectId
+  category        Category  @relation(fields: [categoryId], references: [id])
+  creatorId       String?   @db.ObjectId
+  creator         User?     @relation("QuizCreator", fields: [creatorId], references: [id])
+  questions       Question[]
+  submissions     QuizSubmission[]
+}
+
+model Question{
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  text            String
+  type            String   @default("multiple_choice") // multiple_choice, true_false, short_answer
+  quizId          String    @db.ObjectId
+  difficulty      String?
+  explanation     String?  // Explanation for the correct answer
+  quiz            Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options         Option[]
+  answers         QuizAnswer[]
+}
+
+model Option{
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  text            String
+  isCorrect       Boolean
+  questionId      String    @db.ObjectId
+  question        Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedAnswers QuizAnswer[]
+}
+
+
+model CategoryStat {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id])
+  categoryId    String   @db.ObjectId
+  category      Category @relation(fields: [categoryId], references: [id])
+  attempts      Int @default(0) // Total attempts in this category
+  completed     Int @default(0) // Total completed quizzes in this category
+  averageScore  Float? 
+  lastAttempt   DateTime? // Last attempt in this category
+
+  @@unique([userId, categoryId])
+}
+
+model QuizSubmission {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id])
+  quizId        String   @db.ObjectId
+  quiz          Quiz     @relation(fields: [quizId], references: [id])
+  score         Float    // Score achieved (0-100)
+  totalQuestions Int     // Total number of questions
+  correctAnswers Int     // Number of correct answers
+  timeSpent     Int?     // Time spent in seconds
+  submittedAt   DateTime @default(now())
+  answers       QuizAnswer[]
+
+  @@unique([userId, quizId])
+}
+
+model QuizAnswer {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  submissionId  String   @db.ObjectId
+  submission    QuizSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  questionId    String   @db.ObjectId
+  question      Question @relation(fields: [questionId], references: [id])
+  selectedOptionId String? @db.ObjectId
+  selectedOption   Option? @relation(fields: [selectedOptionId], references: [id])
+  textAnswer    String?  // For short answer questions
+  isCorrect     Boolean
+}

@@ -1,0 +1,62 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="chemGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4c1d95;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="#faf5ff"/>
+  
+  <!-- Main Container -->
+  <rect x="25" y="35" width="250" height="130" fill="url(#chemGradient)" rx="12"/>
+  
+  <!-- Molecule Structure (Water H2O) -->
+  <!-- Oxygen atom -->
+  <circle cx="150" cy="90" r="12" fill="#ef4444"/>
+  <text x="150" y="95" text-anchor="middle" fill="#fff" font-family="Arial" font-size="10" font-weight="bold">O</text>
+  
+  <!-- Hydrogen atoms -->
+  <circle cx="120" cy="70" r="8" fill="#f97316"/>
+  <text x="120" y="75" text-anchor="middle" fill="#fff" font-family="Arial" font-size="8" font-weight="bold">H</text>
+  
+  <circle cx="180" cy="70" r="8" fill="#f97316"/>
+  <text x="180" y="75" text-anchor="middle" fill="#fff" font-family="Arial" font-size="8" font-weight="bold">H</text>
+  
+  <!-- Bonds -->
+  <line x1="138" y1="82" x2="128" y2="75" stroke="#ffffff" stroke-width="3"/>
+  <line x1="162" y1="82" x2="172" y2="75" stroke="#ffffff" stroke-width="3"/>
+  
+  <!-- Test Tubes -->
+  <rect x="60" y="110" width="12" height="40" fill="#06b6d4" rx="6 6 0 0"/>
+  <rect x="60" y="140" width="12" height="15" fill="#374151" rx="0 0 3 3"/>
+  
+  <rect x="80" y="115" width="12" height="35" fill="#22c55e" rx="6 6 0 0"/>
+  <rect x="80" y="140" width="12" height="15" fill="#374151" rx="0 0 3 3"/>
+  
+  <rect x="100" y="120" width="12" height="30" fill="#f59e0b" rx="6 6 0 0"/>
+  <rect x="100" y="140" width="12" height="15" fill="#374151" rx="0 0 3 3"/>
+  
+  <!-- Beaker -->
+  <path d="M200 120 L200 140 Q200 145 205 145 L225 145 Q230 145 230 140 L230 120" 
+        stroke="#ffffff" stroke-width="2" fill="none"/>
+  <rect x="202" y="120" width="26" height="8" fill="#22d3ee" opacity="0.6"/>
+  
+  <!-- Chemical Formula -->
+  <rect x="40" y="45" width="60" height="25" fill="#1f2937" rx="4"/>
+  <text x="70" y="58" text-anchor="middle" fill="#ffffff" font-family="serif" font-size="12">H₂SO₄</text>
+  <text x="70" y="68" text-anchor="middle" fill="#22d3ee" font-family="serif" font-size="8">Acid</text>
+  
+  <!-- Periodic Table Element -->
+  <rect x="200" y="50" width="25" height="25" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="212" y="60" text-anchor="middle" fill="#8b5cf6" font-family="Arial" font-size="8">6</text>
+  <text x="212" y="70" text-anchor="middle" fill="#8b5cf6" font-family="Arial" font-size="14" font-weight="bold">C</text>
+  
+  <!-- Reaction Arrow -->
+  <path d="M240 100 L260 100 M255 95 L260 100 L255 105" stroke="#fbbf24" stroke-width="3" fill="none"/>
+  
+  <!-- Title -->
+  <rect x="0" y="0" width="300" height="30" fill="#4c1d95"/>
+  <text x="150" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Chemistry Fundamentals</text>
+</svg>

@@ -1,0 +1,52 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="physicsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7f1d1d;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="#fef2f2"/>
+  
+  <!-- Main Container -->
+  <rect x="25" y="35" width="250" height="130" fill="url(#physicsGradient)" rx="12"/>
+  
+  <!-- Atom Structure -->
+  <!-- Nucleus -->
+  <circle cx="150" cy="100" r="15" fill="#fbbf24"/>
+  
+  <!-- Electron Orbits -->
+  <ellipse cx="150" cy="100" rx="35" ry="20" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+  <ellipse cx="150" cy="100" rx="50" ry="30" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+  <ellipse cx="150" cy="100" rx="65" ry="40" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+  
+  <!-- Electrons -->
+  <circle cx="185" cy="100" r="4" fill="#60a5fa"/>
+  <circle cx="115" cy="100" r="4" fill="#60a5fa"/>
+  <circle cx="150" cy="70" r="4" fill="#34d399"/>
+  <circle cx="150" cy="130" r="4" fill="#34d399"/>
+  <circle cx="215" cy="100" r="4" fill="#f472b6"/>
+  <circle cx="85" cy="100" r="4" fill="#f472b6"/>
+  
+  <!-- Physics Formula Area -->
+  <rect x="40" y="45" width="80" height="30" fill="#1f2937" rx="4"/>
+  <text x="80" y="58" text-anchor="middle" fill="#ffffff" font-family="serif" font-size="12">E = mc²</text>
+  <text x="80" y="70" text-anchor="middle" fill="#22d3ee" font-family="serif" font-size="10">Energy</text>
+  
+  <!-- Wave Function -->
+  <path d="M180 130 Q200 120 220 130 T260 130" stroke="#10b981" stroke-width="3" fill="none"/>
+  <text x="220" y="145" text-anchor="middle" fill="#ffffff" font-family="serif" font-size="10">Wave</text>
+  
+  <!-- Pendulum -->
+  <line x1="60" y1="50" x2="80" y2="85" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="80" cy="85" r="6" fill="#f59e0b"/>
+  
+  <!-- Force Vector -->
+  <path d="M240 70 L255 70 M250 65 L255 70 L250 75" stroke="#ef4444" stroke-width="3" fill="none"/>
+  <text x="248" y="85" text-anchor="middle" fill="#ffffff" font-family="serif" font-size="8">F</text>
+  
+  <!-- Title -->
+  <rect x="0" y="0" width="300" height="30" fill="#7f1d1d"/>
+  <text x="150" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="13" font-weight="bold">Physics Principles</text>
+</svg>

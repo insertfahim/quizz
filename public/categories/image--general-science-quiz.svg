@@ -1,0 +1,80 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sciGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#064e3b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="#ecfdf5"/>
+  
+  <!-- Main Container -->
+  <rect x="20" y="35" width="260" height="130" fill="url(#sciGradient)" rx="12"/>
+  
+  <!-- Physics Section -->
+  <!-- Atom with orbits -->
+  <circle cx="70" cy="70" r="8" fill="#fbbf24"/>
+  <ellipse cx="70" cy="70" rx="18" ry="10" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+  <circle cx="88" cy="70" r="3" fill="#60a5fa"/>
+  <circle cx="52" cy="70" r="3" fill="#60a5fa"/>
+  <text x="70" y="90" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="8">Physics</text>
+  
+  <!-- Chemistry Section -->
+  <!-- Molecular structure -->
+  <circle cx="150" cy="60" r="6" fill="#ef4444"/>
+  <circle cx="135" cy="75" r="5" fill="#22c55e"/>
+  <circle cx="165" cy="75" r="5" fill="#22c55e"/>
+  <line x1="150" y1="66" x2="135" y2="70" stroke="#ffffff" stroke-width="2"/>
+  <line x1="150" y1="66" x2="165" y2="70" stroke="#ffffff" stroke-width="2"/>
+  <text x="150" y="95" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="8">Chemistry</text>
+  
+  <!-- Biology Section -->
+  <!-- DNA helix -->
+  <path d="M220 55 Q230 60 240 55 Q250 50 260 55" stroke="#34d399" stroke-width="3" fill="none"/>
+  <path d="M220 75 Q230 70 240 75 Q250 80 260 75" stroke="#34d399" stroke-width="3" fill="none"/>
+  <line x1="225" y1="60" x2="225" y2="70" stroke="#ffffff" stroke-width="1"/>
+  <line x1="235" y1="60" x2="235" y2="70" stroke="#ffffff" stroke-width="1"/>
+  <line x1="245" y1="60" x2="245" y2="70" stroke="#ffffff" stroke-width="1"/>
+  <line x1="255" y1="60" x2="255" y2="70" stroke="#ffffff" stroke-width="1"/>
+  <text x="240" y="90" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="8">Biology</text>
+  
+  <!-- Laboratory Equipment -->
+  <!-- Beaker -->
+  <path d="M60 110 L60 125 Q60 130 65 130 L85 130 Q90 130 90 125 L90 110" 
+        stroke="#ffffff" stroke-width="2" fill="none"/>
+  <rect x="62" y="110" width="26" height="8" fill="#06b6d4" opacity="0.6"/>
+  
+  <!-- Test tube -->
+  <rect x="110" y="105" width="8" height="25" fill="#22c55e" rx="4 4 0 0"/>
+  <rect x="110" y="125" width="8" height="8" fill="#374151" rx="0 0 2 2"/>
+  
+  <!-- Microscope -->
+  <rect x="140" y="110" width="6" height="25" fill="#374151"/>
+  <circle cx="143" cy="107" r="4" fill="#6b7280"/>
+  <rect x="138" y="135" width="10" height="3" fill="#374151"/>
+  
+  <!-- Planet/Solar System -->
+  <circle cx="190" cy="120" r="8" fill="#3b82f6"/>
+  <ellipse cx="190" cy="120" rx="15" ry="8" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <circle cx="205" cy="120" r="2" fill="#f59e0b"/>
+  
+  <!-- Mathematical Formula -->
+  <rect x="220" y="105" width="50" height="20" fill="#1f2937" rx="4"/>
+  <text x="245" y="115" text-anchor="middle" fill="#ffffff" font-family="serif" font-size="10">E=mc²</text>
+  <text x="245" y="123" text-anchor="middle" fill="#22d3ee" font-family="serif" font-size="7">Energy</text>
+  
+  <!-- Science Categories Labels -->
+  <rect x="40" y="140" width="40" height="12" fill="#374151" rx="2"/>
+  <text x="60" y="148" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="8">Multi-Disciplinary</text>
+  
+  <rect x="120" y="140" width="30" height="12" fill="#374151" rx="2"/>
+  <text x="135" y="148" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="8">Research</text>
+  
+  <rect x="180" y="140" width="30" height="12" fill="#374151" rx="2"/>
+  <text x="195" y="148" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="8">Discovery</text>
+  
+  <!-- Title -->
+  <rect x="0" y="0" width="300" height="30" fill="#064e3b"/>
+  <text x="150" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">General Science Quiz</text>
+</svg>

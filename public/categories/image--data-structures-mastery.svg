@@ -1,0 +1,65 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="dsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4c1d95;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="#faf5ff"/>
+  
+  <!-- Main Container -->
+  <rect x="20" y="40" width="260" height="120" fill="url(#dsGradient)" rx="10"/>
+  
+  <!-- Tree Structure -->
+  <!-- Root Node -->
+  <circle cx="150" cy="70" r="12" fill="#fbbf24"/>
+  <text x="150" y="75" text-anchor="middle" fill="#000" font-family="Arial" font-size="10" font-weight="bold">A</text>
+  
+  <!-- Level 1 Nodes -->
+  <circle cx="100" cy="100" r="10" fill="#34d399"/>
+  <text x="100" y="105" text-anchor="middle" fill="#000" font-family="Arial" font-size="9" font-weight="bold">B</text>
+  
+  <circle cx="200" cy="100" r="10" fill="#34d399"/>
+  <text x="200" y="105" text-anchor="middle" fill="#000" font-family="Arial" font-size="9" font-weight="bold">C</text>
+  
+  <!-- Level 2 Nodes -->
+  <circle cx="75" cy="130" r="8" fill="#60a5fa"/>
+  <text x="75" y="134" text-anchor="middle" fill="#000" font-family="Arial" font-size="8" font-weight="bold">D</text>
+  
+  <circle cx="125" cy="130" r="8" fill="#60a5fa"/>
+  <text x="125" y="134" text-anchor="middle" fill="#000" font-family="Arial" font-size="8" font-weight="bold">E</text>
+  
+  <circle cx="225" cy="130" r="8" fill="#60a5fa"/>
+  <text x="225" y="134" text-anchor="middle" fill="#000" font-family="Arial" font-size="8" font-weight="bold">F</text>
+  
+  <!-- Connections -->
+  <line x1="150" y1="82" x2="100" y2="88" stroke="#ffffff" stroke-width="2"/>
+  <line x1="150" y1="82" x2="200" y2="88" stroke="#ffffff" stroke-width="2"/>
+  <line x1="100" y1="110" x2="75" y2="122" stroke="#ffffff" stroke-width="2"/>
+  <line x1="100" y1="110" x2="125" y2="122" stroke="#ffffff" stroke-width="2"/>
+  <line x1="200" y1="110" x2="225" y2="122" stroke="#ffffff" stroke-width="2"/>
+  
+  <!-- Array Representation -->
+  <rect x="40" y="145" width="20" height="12" fill="#f472b6" stroke="#ffffff" stroke-width="1"/>
+  <rect x="60" y="145" width="20" height="12" fill="#f472b6" stroke="#ffffff" stroke-width="1"/>
+  <rect x="80" y="145" width="20" height="12" fill="#f472b6" stroke="#ffffff" stroke-width="1"/>
+  <rect x="100" y="145" width="20" height="12" fill="#f472b6" stroke="#ffffff" stroke-width="1"/>
+  <rect x="120" y="145" width="20" height="12" fill="#f472b6" stroke="#ffffff" stroke-width="1"/>
+  
+  <text x="50" y="153" text-anchor="middle" fill="#000" font-family="Arial" font-size="8">1</text>
+  <text x="70" y="153" text-anchor="middle" fill="#000" font-family="Arial" font-size="8">2</text>
+  <text x="90" y="153" text-anchor="middle" fill="#000" font-family="Arial" font-size="8">3</text>
+  <text x="110" y="153" text-anchor="middle" fill="#000" font-family="Arial" font-size="8">4</text>
+  <text x="130" y="153" text-anchor="middle" fill="#000" font-family="Arial" font-size="8">5</text>
+  
+  <!-- Stack Representation -->
+  <rect x="180" y="135" width="25" height="8" fill="#10b981" stroke="#ffffff" stroke-width="1"/>
+  <rect x="180" y="143" width="25" height="8" fill="#10b981" stroke="#ffffff" stroke-width="1"/>
+  <rect x="180" y="151" width="25" height="8" fill="#10b981" stroke="#ffffff" stroke-width="1"/>
+  
+  <!-- Title -->
+  <rect x="0" y="0" width="300" height="30" fill="#581c87"/>
+  <text x="150" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Data Structures Mastery</text>
+</svg>

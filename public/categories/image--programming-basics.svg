@@ -1,0 +1,46 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="progGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#064e3b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="#f0fdf4"/>
+  
+  <!-- Code Editor Window -->
+  <rect x="30" y="40" width="240" height="140" fill="url(#progGradient)" rx="8"/>
+  
+  <!-- Title Bar -->
+  <rect x="30" y="40" width="240" height="25" fill="#1f2937" rx="8 8 0 0"/>
+  <circle cx="45" cy="52" r="4" fill="#ef4444"/>
+  <circle cx="60" cy="52" r="4" fill="#f59e0b"/>
+  <circle cx="75" cy="52" r="4" fill="#10b981"/>
+  
+  <!-- Code Area -->
+  <rect x="40" y="75" width="220" height="95" fill="#111827" rx="4"/>
+  
+  <!-- Code Syntax -->
+  <text x="50" y="90" fill="#f97316" font-family="monospace" font-size="12">function</text>
+  <text x="115" y="90" fill="#ffffff" font-family="monospace" font-size="12">hello() {</text>
+  
+  <text x="60" y="105" fill="#22d3ee" font-family="monospace" font-size="12">console</text>
+  <text x="115" y="105" fill="#ffffff" font-family="monospace" font-size="12">.</text>
+  <text x="125" y="105" fill="#a78bfa" font-family="monospace" font-size="12">log</text>
+  <text x="145" y="105" fill="#ffffff" font-family="monospace" font-size="12">(</text>
+  <text x="155" y="105" fill="#34d399" font-family="monospace" font-size="12">"Hello!"</text>
+  <text x="210" y="105" fill="#ffffff" font-family="monospace" font-size="12">);</text>
+  
+  <text x="50" y="120" fill="#ffffff" font-family="monospace" font-size="12">}</text>
+  
+  <text x="50" y="140" fill="#9ca3af" font-family="monospace" font-size="10">// Learn the basics</text>
+  
+  <!-- Brackets Decoration -->
+  <text x="20" y="100" fill="#10b981" font-family="monospace" font-size="24" font-weight="bold">{</text>
+  <text x="275" y="120" fill="#10b981" font-family="monospace" font-size="24" font-weight="bold">}</text>
+  
+  <!-- Title -->
+  <rect x="0" y="0" width="300" height="30" fill="#065f46"/>
+  <text x="150" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="13" font-weight="bold">Programming Basics</text>
+</svg>

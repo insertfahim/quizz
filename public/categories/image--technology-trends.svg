@@ -1,0 +1,37 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="techGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="#f8fafc"/>
+  
+  <!-- Main Tech Circuit Board Design -->
+  <rect x="20" y="40" width="260" height="120" fill="url(#techGradient)" rx="8"/>
+  
+  <!-- Circuit Lines -->
+  <path d="M40 80 L80 80 L80 120 L120 120" stroke="#ffffff" stroke-width="3" fill="none"/>
+  <path d="M160 60 L200 60 L200 100 L240 100" stroke="#ffffff" stroke-width="3" fill="none"/>
+  <path d="M40 140 L100 140 L100 100 L160 100" stroke="#ffffff" stroke-width="3" fill="none"/>
+  
+  <!-- Circuit Nodes -->
+  <circle cx="80" cy="80" r="6" fill="#fbbf24"/>
+  <circle cx="120" cy="120" r="6" fill="#34d399"/>
+  <circle cx="200" cy="60" r="6" fill="#60a5fa"/>
+  <circle cx="240" cy="100" r="6" fill="#f472b6"/>
+  <circle cx="100" cy="140" r="6" fill="#fbbf24"/>
+  
+  <!-- Trending Arrow -->
+  <path d="M220 30 L260 30 L250 20 M260 30 L250 40" stroke="#10b981" stroke-width="4" fill="none" stroke-linecap="round"/>
+  
+  <!-- Innovation Symbols -->
+  <rect x="50" y="50" width="20" height="20" fill="#ffffff" rx="2"/>
+  <rect x="180" y="130" width="20" height="20" fill="#ffffff" rx="2"/>
+  
+  <!-- Title Area -->
+  <rect x="0" y="0" width="300" height="30" fill="#1e293b"/>
+  <text x="150" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Technology Trends</text>
+</svg>

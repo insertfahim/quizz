@@ -19,159 +19,198 @@ const prisma = new PrismaClient();
 const categories = [
     {
         name: "Science",
-        description: "Science is the pursuit and application of knowledge and understanding of the natural and social world following a systematic methodology based on evidence.",
-        image: "/categories/image--science.svg"
+        description:
+            "Science is the pursuit and application of knowledge and understanding of the natural and social world following a systematic methodology based on evidence.",
+        image: "/categories/image--science.svg",
     },
     {
         name: "Technology",
-        description: "Dive into the latest technological advancements and digital innovations.",
-        image: "/categories/image--technology.svg"
+        description:
+            "Dive into the latest technological advancements and digital innovations.",
+        image: "/categories/image--technology.svg",
     },
     {
         name: "Programming",
-        description: "Learn about coding, software development, and programming languages.",
-        image: "/categories/image--programming.svg"
+        description:
+            "Learn about coding, software development, and programming languages.",
+        image: "/categories/image--programming.svg",
     },
     {
         name: "Computer Science",
-        description: "Understand the fundamentals of computers, algorithms, and computational thinking.",
-        image: "/categories/image--computer-science.svg"
+        description:
+            "Understand the fundamentals of computers, algorithms, and computational thinking.",
+        image: "/categories/image--computer-science.svg",
     },
     {
         name: "Mathematics",
-        description: "Master the language of numbers, patterns, and logical reasoning.",
-        image: "/categories/image--mathematics.svg"
+        description:
+            "Master the language of numbers, patterns, and logical reasoning.",
+        image: "/categories/image--mathematics.svg",
     },
     {
         name: "History",
-        description: "Discover the events, people, and civilizations that shaped our world.",
-        image: "/categories/image--history.svg"
+        description:
+            "Discover the events, people, and civilizations that shaped our world.",
+        image: "/categories/image--history.svg",
     },
     {
         name: "Art",
-        description: "Appreciate creativity through various forms of artistic expression.",
-        image: "/categories/image--art.svg"
+        description:
+            "Appreciate creativity through various forms of artistic expression.",
+        image: "/categories/image--art.svg",
     },
     {
         name: "Geography",
-        description: "Explore the physical features, climates, and cultures of our planet.",
-        image: "/categories/image--geography.svg"
+        description:
+            "Explore the physical features, climates, and cultures of our planet.",
+        image: "/categories/image--geography.svg",
     },
     {
         name: "Physics",
-        description: "Unravel the laws governing matter, energy, and the universe.",
-        image: "/categories/image--physics.svg"
+        description:
+            "Unravel the laws governing matter, energy, and the universe.",
+        image: "/categories/image--physics.svg",
     },
     {
         name: "Biology",
-        description: "Study the science of living organisms and life processes.",
-        image: "/categories/image--biology.svg"
+        description:
+            "Study the science of living organisms and life processes.",
+        image: "/categories/image--biology.svg",
     },
     {
         name: "Chemistry",
-        description: "Explore the properties, composition, and behavior of matter.",
-        image: "/categories/image--chemistry.svg"
+        description:
+            "Explore the properties, composition, and behavior of matter.",
+        image: "/categories/image--chemistry.svg",
     },
     {
         name: "Data Structures",
         description: "Learn about organizing and storing data efficiently.",
-        image: "/categories/image--data-structures.svg"
-    }
+        image: "/categories/image--data-structures.svg",
+    },
 ];
 
-// All quizzes with their questions
+// All quizzes with their questions and specific images
 const quizzes = [
     {
         title: "Computer Science Fundamentals",
-        description: "Test your knowledge of basic computer science concepts including algorithms, data types, and computational thinking.",
+        description:
+            "Test your knowledge of basic computer science concepts including algorithms, data types, and computational thinking.",
         categoryName: "Computer Science",
+        image: "/categories/image--computer-science-fundamentals.svg",
         questions: csQuestions,
-        timeLimit: 20
+        timeLimit: 20,
     },
     {
         title: "Programming Basics",
-        description: "Assess your understanding of fundamental programming concepts, syntax, and best practices.",
+        description:
+            "Assess your understanding of fundamental programming concepts, syntax, and best practices.",
         categoryName: "Programming",
+        image: "/categories/image--programming-basics.svg",
         questions: programmingQuestions,
-        timeLimit: 25
+        timeLimit: 25,
     },
     {
         title: "Data Structures Mastery",
-        description: "Challenge yourself with questions about arrays, linked lists, trees, and other data structures.",
+        description:
+            "Challenge yourself with questions about arrays, linked lists, trees, and other data structures.",
         categoryName: "Data Structures",
+        image: "/categories/image--data-structures-mastery.svg",
         questions: dsQuestions,
-        timeLimit: 30
+        timeLimit: 30,
     },
     {
         title: "Physics Principles",
-        description: "Explore fundamental physics concepts from mechanics to thermodynamics.",
+        description:
+            "Explore fundamental physics concepts from mechanics to thermodynamics.",
         categoryName: "Physics",
+        image: "/categories/image--physics-principles.svg",
         questions: physicsQuestions,
-        timeLimit: 25
+        timeLimit: 25,
     },
     {
         title: "Biology Essentials",
-        description: "Test your knowledge of life sciences, from cells to ecosystems.",
+        description:
+            "Test your knowledge of life sciences, from cells to ecosystems.",
         categoryName: "Biology",
+        image: "/categories/image--biology-essentials.svg",
         questions: biologyQuestions,
-        timeLimit: 20
+        timeLimit: 20,
     },
     {
         title: "Chemistry Fundamentals",
-        description: "Explore atoms, molecules, reactions, and chemical principles.",
+        description:
+            "Explore atoms, molecules, reactions, and chemical principles.",
         categoryName: "Chemistry",
+        image: "/categories/image--chemistry-fundamentals.svg",
         questions: chemistryQuestions,
-        timeLimit: 25
+        timeLimit: 25,
     },
     {
         title: "Mathematics Challenge",
         description: "Test your mathematical skills from algebra to calculus.",
         categoryName: "Mathematics",
+        image: "/categories/image--mathematics-challenge.svg",
         questions: mathematicsQuestions,
-        timeLimit: 30
+        timeLimit: 30,
     },
     {
         title: "World History",
-        description: "Journey through time and test your knowledge of historical events and figures.",
+        description:
+            "Journey through time and test your knowledge of historical events and figures.",
         categoryName: "History",
+        image: "/categories/image--world-history.svg",
         questions: historyQuestions,
-        timeLimit: 20
+        timeLimit: 20,
     },
     {
         title: "Geography Explorer",
-        description: "Navigate through continents, countries, and geographical features.",
+        description:
+            "Navigate through continents, countries, and geographical features.",
         categoryName: "Geography",
+        image: "/categories/image--geography-explorer.svg",
         questions: geographyQuestions,
-        timeLimit: 20
+        timeLimit: 20,
     },
     {
         title: "Technology Trends",
-        description: "Stay updated with modern technology, innovations, and digital concepts.",
+        description:
+            "Stay updated with modern technology, innovations, and digital concepts.",
         categoryName: "Technology",
+        image: "/categories/image--technology-trends.svg",
         questions: technologyQuestions,
-        timeLimit: 15
+        timeLimit: 15,
     },
     {
         title: "Art Appreciation",
-        description: "Explore the world of art, from classical masterpieces to modern movements.",
+        description:
+            "Explore the world of art, from classical masterpieces to modern movements.",
         categoryName: "Art",
+        image: "/categories/image--art-appreciation.svg",
         questions: artQuestions,
-        timeLimit: 20
+        timeLimit: 20,
     },
     {
         title: "Advanced Programming",
-        description: "Deep dive into advanced programming concepts and techniques.",
+        description:
+            "Deep dive into advanced programming concepts and techniques.",
         categoryName: "Programming",
+        image: "/categories/image--advanced-programming.svg",
         questions: programmingQuestions.slice(5, 15), // Using subset for variety
-        timeLimit: 25
+        timeLimit: 25,
     },
     {
         title: "General Science Quiz",
         description: "A mix of questions from various science disciplines.",
         categoryName: "Science",
-        questions: [...physicsQuestions.slice(0, 3), ...chemistryQuestions.slice(0, 3), ...biologyQuestions.slice(0, 4)],
-        timeLimit: 20
-    }
+        image: "/categories/image--general-science-quiz.svg",
+        questions: [
+            ...physicsQuestions.slice(0, 3),
+            ...chemistryQuestions.slice(0, 3),
+            ...biologyQuestions.slice(0, 4),
+        ],
+        timeLimit: 20,
+    },
 ];
 
 async function main() {
@@ -181,7 +220,7 @@ async function main() {
     try {
         // Optional: Clear existing data (comment out to preserve existing data)
         const clearData = process.argv.includes("--clear");
-        
+
         if (clearData) {
             console.log("🧹 Clearing existing data...");
             await prisma.quizAnswer.deleteMany();
@@ -198,13 +237,13 @@ async function main() {
         // 1. Seed Categories
         console.log("\n📂 Seeding categories...");
         const createdCategories = [];
-        
+
         for (const category of categories) {
             // Check if category exists
             const existingCategory = await prisma.category.findFirst({
-                where: { name: category.name }
+                where: { name: category.name },
             });
-            
+
             if (existingCategory) {
                 createdCategories.push(existingCategory);
                 console.log(`⏭️  Category already exists: ${category.name}`);
@@ -221,12 +260,12 @@ async function main() {
         console.log("\n📝 Seeding quizzes...");
         let totalQuizzesCreated = 0;
         let totalQuestionsCreated = 0;
-        
+
         for (const quiz of quizzes) {
             const category = createdCategories.find(
                 (cat) => cat.name === quiz.categoryName
             );
-            
+
             if (!category) {
                 console.log(`❌ Category not found for quiz: ${quiz.title}`);
                 continue;
@@ -234,10 +273,10 @@ async function main() {
 
             // Check if quiz already exists
             const existingQuiz = await prisma.quiz.findFirst({
-                where: { 
+                where: {
                     title: quiz.title,
-                    categoryId: category.id
-                }
+                    categoryId: category.id,
+                },
             });
 
             if (existingQuiz) {
@@ -250,13 +289,16 @@ async function main() {
                 data: {
                     title: quiz.title,
                     description: quiz.description,
+                    image: quiz.image,
                     categoryId: category.id,
                     timeLimit: quiz.timeLimit,
                     isActive: true,
                 },
             });
             totalQuizzesCreated++;
-            console.log(`✅ Created quiz: ${quiz.title} (${quiz.questions.length} questions)`);
+            console.log(
+                `✅ Created quiz: ${quiz.title} (${quiz.questions.length} questions)`
+            );
 
             // 3. Seed Questions and Options for this quiz
             for (const question of quiz.questions) {
@@ -267,21 +309,31 @@ async function main() {
                             quizId: createdQuiz.id,
                             difficulty: question.difficulty || "Medium",
                             explanation: question.explanation || null,
-                            type: question.options.length === 2 && 
-                                  question.options.some(opt => opt.text === "True" || opt.text === "False") 
-                                  ? "true_false" 
-                                  : "multiple_choice",
+                            type:
+                                question.options.length === 2 &&
+                                question.options.some(
+                                    (opt) =>
+                                        opt.text === "True" ||
+                                        opt.text === "False"
+                                )
+                                    ? "true_false"
+                                    : "multiple_choice",
                             options: {
-                                create: question.options.map(option => ({
+                                create: question.options.map((option) => ({
                                     text: option.text,
-                                    isCorrect: option.isCorrect
+                                    isCorrect: option.isCorrect,
                                 })),
                             },
                         },
                     });
                     totalQuestionsCreated++;
                 } catch (error) {
-                    console.error(`❌ Error creating question: ${question.text.substring(0, 50)}...`);
+                    console.error(
+                        `❌ Error creating question: ${question.text.substring(
+                            0,
+                            50
+                        )}...`
+                    );
                     console.error(error.message);
                 }
             }
@@ -294,7 +346,7 @@ async function main() {
         console.log(`   - Categories: ${createdCategories.length}`);
         console.log(`   - New Quizzes: ${totalQuizzesCreated}`);
         console.log(`   - New Questions: ${totalQuestionsCreated}`);
-        
+
         // Final counts
         const finalCounts = await prisma.$transaction([
             prisma.category.count(),
@@ -302,13 +354,12 @@ async function main() {
             prisma.question.count(),
             prisma.option.count(),
         ]);
-        
+
         console.log("\n📈 Total Database Contents:");
         console.log(`   - Total Categories: ${finalCounts[0]}`);
         console.log(`   - Total Quizzes: ${finalCounts[1]}`);
         console.log(`   - Total Questions: ${finalCounts[2]}`);
         console.log(`   - Total Options: ${finalCounts[3]}`);
-        
     } catch (error) {
         console.error("\n❌ Error during seeding:", error);
         throw error;

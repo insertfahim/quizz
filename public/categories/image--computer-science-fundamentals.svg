@@ -1,0 +1,39 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="csGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="#f1f5f9"/>
+  
+  <!-- Main Computer Design -->
+  <rect x="40" y="50" width="220" height="120" fill="url(#csGradient)" rx="12"/>
+  
+  <!-- Screen -->
+  <rect x="60" y="70" width="180" height="80" fill="#1f2937" rx="4"/>
+  
+  <!-- Code Lines -->
+  <rect x="80" y="85" width="60" height="3" fill="#10b981"/>
+  <rect x="80" y="95" width="80" height="3" fill="#f59e0b"/>
+  <rect x="80" y="105" width="40" height="3" fill="#ef4444"/>
+  <rect x="80" y="115" width="100" height="3" fill="#8b5cf6"/>
+  <rect x="80" y="125" width="70" height="3" fill="#06b6d4"/>
+  
+  <!-- Binary Numbers -->
+  <text x="160" y="100" fill="#64748b" font-family="monospace" font-size="10">101010</text>
+  <text x="180" y="115" fill="#64748b" font-family="monospace" font-size="10">110110</text>
+  <text x="170" y="130" fill="#64748b" font-family="monospace" font-size="10">001101</text>
+  
+  <!-- Algorithm Symbol -->
+  <path d="M200 85 L220 95 L200 105 L210 95 Z" fill="#fbbf24"/>
+  
+  <!-- Keyboard Base -->
+  <rect x="50" y="160" width="200" height="15" fill="#374151" rx="2"/>
+  
+  <!-- Title -->
+  <rect x="0" y="0" width="300" height="30" fill="#0f172a"/>
+  <text x="150" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="13" font-weight="bold">CS Fundamentals</text>
+</svg>

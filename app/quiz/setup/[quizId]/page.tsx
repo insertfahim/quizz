@@ -9,38 +9,74 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useGlobalContext } from "@/context/globalContext";
 import { play } from "@/utils/Icons";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useParams } from "next/navigation";
 
 function page() {
     const router = useRouter();
-    const { quizSetup, setQuizSetup, selectedQuiz, setFilteredQuestions } =
-        useGlobalContext();
+    const params = useParams();
+
+    const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
+    const [quizSetup, setQuizSetup] = useState({
+        questionCount: 10,
+        difficulty: "unspecified",
+    });
+    const [filteredQuestions, setFilteredQuestions] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!selectedQuiz) {
+        // Try to get quiz from localStorage first
+        const storedQuiz = localStorage.getItem("selectedQuiz");
+        if (storedQuiz) {
+            const quiz = JSON.parse(storedQuiz);
+            setSelectedQuiz(quiz);
+            setQuizSetup((prev) => ({
+                ...prev,
+                questionCount: Math.min(10, quiz.questions?.length || 1),
+            }));
+        } else {
+            // If no stored quiz, fetch by ID
+            fetchQuizById(params.quizId as string);
+        }
+        setLoading(false);
+    }, [params.quizId]);
+
+    const fetchQuizById = async (quizId: string) => {
+        try {
+            const response = await axios.get(`/api/quizzes/${quizId}`);
+            const quiz = response.data;
+            setSelectedQuiz(quiz);
+            localStorage.setItem("selectedQuiz", JSON.stringify(quiz));
+            setQuizSetup((prev) => ({
+                ...prev,
+                questionCount: Math.min(10, quiz.questions?.length || 1),
+            }));
+        } catch (error) {
+            console.error("Error fetching quiz:", error);
+            toast.error("Quiz not found");
             router.push("/");
         }
-    }, [selectedQuiz, router]);
+    };
 
     useEffect(() => {
-        const filteredQuestions = selectedQuiz?.questions.filter(
-            (q: { difficulty: string }) => {
-                return (
-                    !quizSetup?.difficulty ||
-                    quizSetup?.difficulty === "unspecified" ||
-                    q?.difficulty.toLowerCase() ===
-                        quizSetup?.difficulty.toLowerCase()
-                );
-            }
-        );
+        if (!selectedQuiz) return;
 
-        setFilteredQuestions(filteredQuestions);
-    }, [quizSetup]);
+        const filtered =
+            selectedQuiz.questions?.filter((q: { difficulty: string }) => {
+                return (
+                    !quizSetup.difficulty ||
+                    quizSetup.difficulty === "unspecified" ||
+                    q?.difficulty.toLowerCase() ===
+                        quizSetup.difficulty.toLowerCase()
+                );
+            }) || [];
+
+        setFilteredQuestions(filtered);
+    }, [selectedQuiz, quizSetup]);
 
     const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value, 10);
@@ -49,43 +85,72 @@ function page() {
         const newCount =
             isNaN(value) || value < 1 ? 1 : Math.min(value, maxQuestions);
 
-        setQuizSetup((prev: {}) => ({ ...prev, questionCount: newCount }));
+        setQuizSetup((prev) => ({ ...prev, questionCount: newCount }));
     };
 
     const handleDifficultyChange = (difficulty: string) => {
-        setQuizSetup((prev: {}) => ({ ...prev, difficulty }));
-
-        console.log("Difficulty: ", difficulty);
+        setQuizSetup((prev) => ({ ...prev, difficulty }));
     };
 
     const startQuiz = async () => {
-        const selectedQuestions = selectedQuiz?.questions
-            .slice(0, quizSetup?.questionCount)
-            .filter((q: { difficulty: string }) => {
-                return (
-                    quizSetup?.difficulty ||
-                    q.difficulty?.toLowerCase() ===
-                        selectedQuiz?.difficulty?.toLowerCase()
-                );
+        if (!selectedQuiz) {
+            toast.error("No quiz selected");
+            return;
+        }
+
+        const questionsToUse = filteredQuestions.slice(
+            0,
+            quizSetup.questionCount
+        );
+
+        if (questionsToUse.length === 0) {
+            toast.error("No questions found for the selected criteria");
+            return;
+        }
+
+        try {
+            // Store quiz setup and filtered questions for the quiz page
+            localStorage.setItem("quizSetup", JSON.stringify(quizSetup));
+            localStorage.setItem(
+                "filteredQuestions",
+                JSON.stringify(questionsToUse)
+            );
+
+            // Start quiz attempt in database
+            await axios.post("/api/user/quiz/start", {
+                quizId: selectedQuiz.id,
             });
 
-        if (selectedQuestions.length > 0) {
-            //update the db for quiz attempt start
-
-            try {
-                await axios.post("/api/user/quiz/start", {
-                    quizId: selectedQuiz?.id,
-                });
-            } catch (error) {
-                console.log("Error starting quiz: ", error);
-            }
-
-            // pushh to the quiz page
+            // Navigate to quiz page
             router.push("/quiz");
-        } else {
-            toast.error("No questions found for the selected criteria");
+        } catch (error) {
+            console.error("Error starting quiz:", error);
+            toast.error("Failed to start quiz. Please try again.");
         }
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (!selectedQuiz) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-600">
+                        Quiz not found
+                    </h2>
+                    <p className="text-gray-500 mt-2">
+                        The quiz you're looking for doesn't exist.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -101,9 +166,9 @@ function page() {
                             type="number"
                             min={1}
                             id="questionCount"
-                            value={quizSetup?.questionCount}
+                            value={quizSetup.questionCount}
                             onChange={handleQuestionChange}
-                            max={selectedQuiz?.questions.length}
+                            max={selectedQuiz.questions?.length || 1}
                         />
                     </div>
 

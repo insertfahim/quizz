@@ -1,13 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/connect";
+import { getCurrentUser } from "@/utils/auth";
 
 export async function POST(req: NextRequest) {
     try {
-        const { userId: clerkId } = await auth();
+        const user = await getCurrentUser(req);
         const { quizId } = await req.json();
 
-        if (!clerkId) {
+        if (!user) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -18,18 +18,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 { error: "Quiz ID is required" },
                 { status: 400 }
-            );
-        }
-
-        // Verify user exists
-        const user = await prisma.user.findUnique({
-            where: { clerkId },
-        });
-
-        if (!user) {
-            return NextResponse.json(
-                { error: "User not found" },
-                { status: 404 }
             );
         }
 
@@ -49,6 +37,7 @@ export async function POST(req: NextRequest) {
             message: "Quiz started successfully",
             quizId,
             startTime: new Date(),
+            user: { id: user.id, name: user.name },
         });
     } catch (error) {
         console.error("Error starting quiz:", error);

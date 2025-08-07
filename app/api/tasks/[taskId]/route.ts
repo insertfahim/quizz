@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { getCurrentUser } from "@/utils/auth";
 import prisma from "@/utils/connect";
 
 // PUT update a task
@@ -8,23 +8,12 @@ export async function PUT(
     { params }: { params: Promise<{ taskId: string }> }
 ) {
     try {
-        const { userId } = await auth();
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { clerkId: userId },
-        });
+        const user = await getCurrentUser(req);
 
         if (!user) {
             return NextResponse.json(
-                { error: "User not found" },
-                { status: 404 }
+                { error: "Unauthorized" },
+                { status: 401 }
             );
         }
 
@@ -62,23 +51,12 @@ export async function DELETE(
     { params }: { params: Promise<{ taskId: string }> }
 ) {
     try {
-        const { userId } = await auth();
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { clerkId: userId },
-        });
+        const user = await getCurrentUser(req);
 
         if (!user) {
             return NextResponse.json(
-                { error: "User not found" },
-                { status: 404 }
+                { error: "Unauthorized" },
+                { status: 401 }
             );
         }
 

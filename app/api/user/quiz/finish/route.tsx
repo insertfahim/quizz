@@ -1,12 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/connect";
+import { getCurrentUser } from "@/utils/auth";
 
 export async function POST(req: NextRequest) {
     try {
-        const { userId: clerkId } = await auth();
+        const user = await getCurrentUser(req);
 
-        if (!clerkId) {
+        if (!user) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -25,12 +25,6 @@ export async function POST(req: NextRequest) {
 
         // Use transaction for atomic operations
         const result = await prisma.$transaction(async (tx) => {
-            const user = await tx.user.findUnique({ where: { clerkId } });
-
-            if (!user) {
-                throw new Error("User not found");
-            }
-
             // Calculate correct answers count
             const correctAnswers = responses.filter(
                 (r: any) => r.isCorrect

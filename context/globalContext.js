@@ -67,8 +67,6 @@ export const GlobalContextProvider = ({ children }) => {
         }
     };
 
-    console.log("Filtered Questions:", filteredQuestions);
-
     return (
         <GlobalContext.Provider
             value={{

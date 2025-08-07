@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -73,7 +73,7 @@ interface QuizListResponse {
 }
 
 export default function AdminQuizzesPage() {
-    const { isAdmin, loading } = useGlobalContext();
+    const { isAdmin, loading } = useAuth();
     const router = useRouter();
     const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -361,7 +361,8 @@ export default function AdminQuizzesPage() {
                                     <div className="flex items-center gap-6 text-sm text-gray-500">
                                         <span className="flex items-center gap-1">
                                             <Users className="w-4 h-4" />
-                                            Created by {quiz.creator.name}
+                                            Created by{" "}
+                                            {quiz.creator?.name || "Unknown"}
                                         </span>
                                         <span className="flex items-center gap-1">
                                             <BookOpen className="w-4 h-4" />

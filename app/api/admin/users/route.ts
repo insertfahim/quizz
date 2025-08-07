@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/connect";
-import { requireAdmin, createAuditLog, USER_ROLES } from "@/utils/roles";
+import { requireAdmin } from "@/utils/auth";
+import { USER_ROLES } from "@/utils/roles";
 
 export async function GET(req: NextRequest) {
     try {
-        await requireAdmin();
+        await requireAdmin(req);
 
         const searchParams = req.nextUrl.searchParams;
         const page = parseInt(searchParams.get("page") || "1");
@@ -77,7 +78,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const admin = await requireAdmin();
+        const admin = await requireAdmin(req);
         const { name, email, role, clerkId } = await req.json();
 
         // Validate required fields
@@ -119,11 +120,10 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        // Create audit log
-        await createAuditLog("user_created", "user", newUser.id, {
-            createdBy: admin.id,
-            userRole: role,
-        });
+        // TODO: Create audit log functionality if needed
+        console.log(
+            `Admin ${admin.email} created user ${newUser.email} with role ${role}`
+        );
 
         return NextResponse.json(newUser);
     } catch (error: any) {

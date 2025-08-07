@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/connect";
-import { requireTeacher } from "@/utils/roles";
+import { requireTeacher } from "@/utils/auth";
 
 // GET /api/teacher/quizzes - Get all quizzes created by the teacher
 export async function GET(req: NextRequest) {
     try {
-        const teacher = await requireTeacher();
+        const teacher = await requireTeacher(req);
 
         const quizzes = await prisma.quiz.findMany({
             where: { creatorId: teacher.id },
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 // POST /api/teacher/quizzes - Create a new quiz
 export async function POST(req: NextRequest) {
     try {
-        const teacher = await requireTeacher();
+        const teacher = await requireTeacher(req);
         const { title, description, timeLimit, questions } = await req.json();
 
         // Validate required fields

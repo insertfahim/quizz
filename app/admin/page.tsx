@@ -383,7 +383,9 @@ export default function AdminDashboard() {
                                                         {quiz.title}
                                                     </h3>
                                                     <p className="text-sm text-gray-600">
-                                                        by {quiz.creator.name}
+                                                        by{" "}
+                                                        {quiz.creator?.name ||
+                                                            "Unknown"}
                                                     </p>
                                                 </div>
                                                 <div className="text-right">

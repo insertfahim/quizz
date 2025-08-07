@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/connect";
-import { requireTeacher } from "@/utils/roles";
+import { requireTeacher } from "@/utils/auth";
 
 // GET /api/teacher/stats - Get teacher dashboard statistics
 export async function GET(req: NextRequest) {
     try {
-        const teacher = await requireTeacher();
+        const teacher = await requireTeacher(req);
 
         // Get all quizzes created by the teacher
         const teacherQuizzes = await prisma.quiz.findMany({

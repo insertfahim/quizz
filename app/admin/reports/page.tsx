@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
@@ -39,7 +39,7 @@ interface ReportData {
 }
 
 export default function AdminReportsPage() {
-    const { isAdmin, loading } = useGlobalContext();
+    const { isAdmin, loading } = useAuth();
     const router = useRouter();
     const [reportData, setReportData] = useState<ReportData | null>(null);
     const [isLoading, setIsLoading] = useState(true);

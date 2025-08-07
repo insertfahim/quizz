@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/connect";
-import { requireAdmin, createAuditLog } from "@/utils/roles";
+import { requireAdmin } from "@/utils/auth";
 
 export async function GET(req: NextRequest) {
     try {
-        await requireAdmin();
+        await requireAdmin(req);
 
         const searchParams = req.nextUrl.searchParams;
         const page = parseInt(searchParams.get("page") || "1");
@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
     try {
-        const admin = await requireAdmin();
+        const admin = await requireAdmin(req);
         const { quizId, isActive, title, description } = await req.json();
 
         if (!quizId) {
@@ -196,7 +196,7 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
     try {
-        const admin = await requireAdmin();
+        const admin = await requireAdmin(req);
         const { quizId } = await req.json();
 
         if (!quizId) {

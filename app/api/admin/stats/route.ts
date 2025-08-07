@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/connect";
-import { requireAdmin } from "@/utils/roles";
+import { requireAdmin } from "@/utils/auth";
 
 export async function GET(req: NextRequest) {
     try {
-        await requireAdmin();
+        await requireAdmin(req);
 
         const searchParams = req.nextUrl.searchParams;
         const period = searchParams.get("period") || "7d"; // 7d, 30d, 90d, 1y
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
             recentUsers,
             recentSubmissions,
             usersByRole,
-            submissionsByDay,
+            recentSubmissionsRaw,
             popularQuizzes,
             userActivityStats,
         ] = await Promise.all([
@@ -105,16 +105,15 @@ export async function GET(req: NextRequest) {
                 },
             }),
 
-            // Daily submissions for the period
-            prisma.$queryRaw`
-                SELECT 
-                    DATE_TRUNC('day', "submittedAt") as date,
-                    COUNT(*) as count
-                FROM "QuizSubmission"
-                WHERE "submittedAt" >= ${startDate}
-                GROUP BY DATE_TRUNC('day', "submittedAt")
-                ORDER BY date DESC
-            `,
+            // Daily submissions for the period (MongoDB compatible)
+            prisma.quizSubmission.findMany({
+                where: {
+                    submittedAt: { gte: startDate },
+                },
+                select: {
+                    submittedAt: true,
+                },
+            }),
 
             // Popular quizzes
             prisma.quiz.findMany({
@@ -211,6 +210,27 @@ export async function GET(req: NextRequest) {
                 submittedAt: { gte: startDate },
             },
         });
+
+        // Process daily submissions data (group by day)
+        const submissionsByDay = recentSubmissionsRaw
+            .reduce((acc: any[], submission: any) => {
+                const date = new Date(submission.submittedAt)
+                    .toISOString()
+                    .split("T")[0]; // Get YYYY-MM-DD
+                const existingDay = acc.find((item) => item.date === date);
+
+                if (existingDay) {
+                    existingDay.count++;
+                } else {
+                    acc.push({ date, count: 1 });
+                }
+
+                return acc;
+            }, [])
+            .sort(
+                (a, b) =>
+                    new Date(b.date).getTime() - new Date(a.date).getTime()
+            );
 
         const stats = {
             overview: {

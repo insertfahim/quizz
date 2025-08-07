@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
@@ -34,7 +34,7 @@ interface Quiz {
 }
 
 export default function TeacherQuizzesPage() {
-    const { isTeacher, loading } = useGlobalContext();
+    const { isTeacher, loading } = useAuth();
     const router = useRouter();
     const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const [isLoading, setIsLoading] = useState(true);

@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/Header";
 import { Nunito } from "next/font/google";
-import ContextProvider from "@/providers/ContextProvider";
 import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
     title: "BRACU Task & Quiz Manager",
-    description: "Daily Task Planner and Quiz Management System for Brac University Students and Faculty",
+    description:
+        "Daily Task Planner and Quiz Management System for Brac University Students and Faculty",
 };
 
 const nunito = Nunito({
@@ -33,20 +33,18 @@ export default function RootLayout({
                     referrerPolicy="no-referrer"
                 />
             </head>
-            <ClerkProvider>
-                <ContextProvider>
-                    <body
-                        className={`${nunito.className}  antialiased`}
-                        suppressHydrationWarning={true}
-                    >
-                        <Toaster position="top-center" />
-                        <Header />
-                        <main className="py-8 mx-[15rem] xl:mx-[25rem] h-full">
-                            {children}
-                        </main>
-                    </body>
-                </ContextProvider>
-            </ClerkProvider>
+            <body
+                className={`${nunito.className}  antialiased`}
+                suppressHydrationWarning={true}
+            >
+                <AuthProvider>
+                    <Toaster position="top-center" />
+                    <Header />
+                    <main className="py-8 mx-[15rem] xl:mx-[25rem] h-full">
+                        {children}
+                    </main>
+                </AuthProvider>
+            </body>
         </html>
     );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -65,7 +65,7 @@ interface UserListResponse {
 }
 
 export default function AdminUsersPage() {
-    const { isAdmin, loading } = useGlobalContext();
+    const { isAdmin, loading } = useAuth();
     const router = useRouter();
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);

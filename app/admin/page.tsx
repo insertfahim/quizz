@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
@@ -85,7 +85,7 @@ interface AdminStats {
 }
 
 export default function AdminDashboard() {
-    const { isAdmin, loading } = useGlobalContext();
+    const { isAdmin, loading } = useAuth();
     const router = useRouter();
     const [stats, setStats] = useState<AdminStats | null>(null);
     const [isLoading, setIsLoading] = useState(true);

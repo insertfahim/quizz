@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "@/context/globalContext";
 import { IQuiz } from "@/types/types";
 import QuizCard from "@/components/quiz/QuizCard";
 import axios from "axios";
 import Loader from "@/components/Loader";
 
 export default function Home() {
-    const { loading } = useGlobalContext();
     const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -28,7 +26,7 @@ export default function Home() {
         }
     };
 
-    if (loading || isLoading) {
+    if (isLoading) {
         return <Loader />;
     }
 

@@ -1,18 +1,29 @@
 "use client";
 import { chart, home, login } from "@/utils/Icons";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { Button } from "./ui/button";
-import { useGlobalContext } from "@/context/globalContext";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useAuth } from "@/context/AuthContext";
 
 function Header() {
     const pathname = usePathname();
     const router = useRouter();
+    const { user, loading, isTeacher, isAdmin, checkAuth } = useAuth();
 
-    const { isTeacher, isAdmin } = useGlobalContext();
+    const handleLogout = async () => {
+        try {
+            await axios.post("/api/auth/logout");
+            await checkAuth(); // This will set user to null
+            toast.success("Logged out successfully");
+            router.push("/");
+        } catch (error) {
+            toast.error("Logout failed");
+        }
+    };
 
     const menu = [
         {
@@ -115,26 +126,40 @@ function Header() {
                 </ul>
 
                 <div>
-                    <SignedIn>
-                        <UserButton
-                            appearance={{
-                                elements: {
-                                    userButtonAvatarBox:
-                                        "w-12 h-12 border-2 border-gray-300  rounded-full",
-                                },
-                            }}
-                        />
-                    </SignedIn>
-                    <SignedOut>
+                    {loading ? (
+                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                    ) : user ? (
+                        <div className="flex items-center gap-3">
+                            <div className="text-right">
+                                <p className="text-sm font-medium text-gray-900">
+                                    {user.name}
+                                </p>
+                                <p className="text-xs text-gray-500 capitalize">
+                                    {user.role}
+                                </p>
+                            </div>
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                                {user.name?.charAt(0).toUpperCase()}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleLogout}
+                                className="ml-2"
+                            >
+                                Logout
+                            </Button>
+                        </div>
+                    ) : (
                         <Button
                             className="py-5 bg-blue-400 flex items-center gap-2 font-semibold text-lg rounded-lg
             hover:bg-blue-500/90"
-                            onClick={() => router.push("/sign-in")}
+                            onClick={() => router.push("/login")}
                         >
                             {login}
                             Login / Sign Up
                         </Button>
-                    </SignedOut>
+                    )}
                 </div>
             </nav>
         </header>

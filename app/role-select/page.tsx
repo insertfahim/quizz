@@ -1,42 +1,29 @@
 "use client";
 
 import { useEffect } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import RoleSelection from "@/components/RoleSelection";
 import Loader from "@/components/Loader";
 
 export default function RoleSelectPage() {
-  const { user, userRole, loading } = useGlobalContext();
+  const { user, isTeacher, isAdmin, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // If user already has a role, redirect them to appropriate dashboard
-    if (!loading && user && userRole) {
-      if (userRole === "teacher") {
+    // This page is deprecated with local auth - roles are set during registration
+    // Redirect to appropriate dashboard based on user role
+    if (!loading) {
+      if (!user) {
+        router.push("/login");
+      } else if (isAdmin) {
+        router.push("/admin");
+      } else if (isTeacher) {
         router.push("/teacher");
       } else {
         router.push("/");
       }
     }
-  }, [user, userRole, loading, router]);
+  }, [user, isTeacher, isAdmin, loading, router]);
 
-  if (loading) {
-    return <Loader />;
-  }
-
-  // If user has no role, show role selection
-  if (user && !userRole) {
-    return (
-      <RoleSelection
-        onRoleSelected={() => {
-          // Refresh the page to reload user context
-          window.location.reload();
-        }}
-      />
-    );
-  }
-
-  // If already redirecting or no user
   return <Loader />;
 }

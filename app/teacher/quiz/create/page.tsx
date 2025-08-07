@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,7 @@ interface Question {
 }
 
 export default function CreateQuizPage() {
-    const { isTeacher, loading } = useGlobalContext();
+    const { isTeacher, loading } = useAuth();
     const router = useRouter();
 
     const [formData, setFormData] = useState({

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ interface QuestionBankItem {
 }
 
 export default function QuestionBankPage() {
-  const { isTeacher, loading: userLoading } = useGlobalContext();
+  const { isTeacher, loading: userLoading } = useAuth();
   const router = useRouter();
   const [questions, setQuestions] = useState<QuestionBankItem[]>([]);
   const [loading, setLoading] = useState(true);

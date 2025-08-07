@@ -177,11 +177,11 @@ export async function PUT(req: NextRequest) {
         }
 
         if (Object.keys(changes).length > 0) {
-            await createAuditLog("quiz_moderated", "quiz", quizId, {
-                changes,
-                moderatedBy: admin.id,
-                quizCreator: currentQuiz.creator,
-            });
+            // TODO: Create audit log functionality if needed
+            console.log(
+                `Admin ${admin.email} updated quiz ${quizId}:`,
+                changes
+            );
         }
 
         return NextResponse.json(updatedQuiz);
@@ -237,16 +237,10 @@ export async function DELETE(req: NextRequest) {
             where: { id: quizId },
         });
 
-        // Create audit log
-        await createAuditLog("quiz_deleted", "quiz", quizId, {
-            deletedQuiz: {
-                title: quiz.title,
-                creator: quiz.creator,
-                questionCount: quiz._count.questions,
-                submissionCount: quiz._count.submissions,
-            },
-            deletedBy: admin.id,
-        });
+        // TODO: Create audit log functionality if needed
+        console.log(
+            `Admin ${admin.email} deleted quiz "${quiz.title}" (ID: ${quizId})`
+        );
 
         return NextResponse.json({ message: "Quiz deleted successfully" });
     } catch (error: any) {

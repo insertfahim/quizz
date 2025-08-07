@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "@/context/globalContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import axios from "axios";
@@ -62,7 +62,7 @@ interface QuizDetails {
 }
 
 export default function QuizDetailsPage() {
-    const { isTeacher, loading } = useGlobalContext();
+    const { isTeacher, loading } = useAuth();
     const router = useRouter();
     const params = useParams();
     const quizId = params.quizId as string;

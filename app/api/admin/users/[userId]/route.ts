@@ -5,13 +5,14 @@ import { USER_ROLES } from "@/utils/roles";
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { userId: string } }
+    { params }: { params: Promise<{ userId: string }> }
 ) {
     try {
         await requireAdmin(req);
+        const { userId } = await params;
 
         const user = await prisma.user.findUnique({
-            where: { id: params.userId },
+            where: { id: userId },
             include: {
                 createdQuizzes: {
                     select: {
@@ -82,10 +83,11 @@ export async function GET(
 
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { userId: string } }
+    { params }: { params: Promise<{ userId: string }> }
 ) {
     try {
         const admin = await requireAdmin(req);
+        const { userId } = await params;
         const { name, email, role, isActive, bio } = await req.json();
 
         // Validate role if provided
@@ -98,7 +100,7 @@ export async function PUT(
 
         // Get current user data for audit log
         const currentUser = await prisma.user.findUnique({
-            where: { id: params.userId },
+            where: { id: userId },
             select: { role: true, isActive: true, name: true, email: true },
         });
 
@@ -111,7 +113,7 @@ export async function PUT(
 
         // Update user
         const updatedUser = await prisma.user.update({
-            where: { id: params.userId },
+            where: { id: userId },
             data: {
                 ...(name && { name }),
                 ...(email && { email }),
@@ -139,7 +141,7 @@ export async function PUT(
         if (Object.keys(changes).length > 0) {
             // TODO: Create audit log functionality if needed
             console.log(
-                `Admin ${admin.email} updated user ${params.userId}:`,
+                `Admin ${admin.email} updated user ${userId}:`,
                 changes
             );
         }
@@ -156,14 +158,15 @@ export async function PUT(
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { userId: string } }
+    { params }: { params: Promise<{ userId: string }> }
 ) {
     try {
         const admin = await requireAdmin(req);
+        const { userId } = await params;
 
         // Check if user exists
         const user = await prisma.user.findUnique({
-            where: { id: params.userId },
+            where: { id: userId },
             select: { id: true, name: true, email: true, role: true },
         });
 
@@ -192,7 +195,7 @@ export async function DELETE(
 
         // Delete user (cascade deletes will handle related records)
         await prisma.user.delete({
-            where: { id: params.userId },
+            where: { id: userId },
         });
 
         // TODO: Create audit log functionality if needed

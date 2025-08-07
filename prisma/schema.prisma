@@ -15,7 +15,7 @@ datasource db {
 
 model User {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId       String?  @unique // Make optional for local auth
+  clerkId       String?  // Make optional for local auth, removed @unique to avoid null conflicts
   email         String   @unique // Make required and unique
   password      String?  // Add password field for local auth
   role          String   @default("student") // student, teacher, admin

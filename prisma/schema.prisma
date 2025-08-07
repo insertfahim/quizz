@@ -19,9 +19,14 @@ model User {
   role          String   @default("student") // student, teacher
   name          String?
   email         String?
+  bio           String?
+  profileImage  String?
   categoryStats CategoryStat[]
   createdQuizzes Quiz[]  @relation("QuizCreator")
   submissions   QuizSubmission[]
+  tasks         Task[]
+  notifications Notification[]
+  questionBanks QuestionBank[]
 }
 
 model Category{
@@ -112,4 +117,51 @@ model QuizAnswer {
   selectedOption   Option? @relation(fields: [selectedOptionId], references: [id])
   textAnswer    String?  // For short answer questions
   isCorrect     Boolean
+}
+
+// Task Planner Models
+model Task {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String?
+  category      String   // study, work, personal
+  priority      String   @default("medium") // low, medium, high
+  status        String   @default("pending") // pending, in_progress, completed
+  dueDate       DateTime?
+  completedAt   DateTime?
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Notification Model
+model Notification {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  type          String   // deadline, result, announcement, task_reminder
+  title         String
+  message       String
+  isRead        Boolean  @default(false)
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id])
+  relatedQuizId String?  @db.ObjectId
+  relatedTaskId String?  @db.ObjectId
+  createdAt     DateTime @default(now())
+}
+
+// Question Bank Model for Teachers
+model QuestionBank {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  text          String
+  type          String   // multiple_choice, true_false, short_answer
+  difficulty    String?
+  explanation   String?
+  category      String
+  isShared      Boolean  @default(false) // private or shared with other teachers
+  creatorId     String   @db.ObjectId
+  creator       User     @relation(fields: [creatorId], references: [id])
+  options       Json?    // Store options as JSON for flexibility
+  correctAnswer String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

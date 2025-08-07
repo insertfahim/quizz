@@ -20,6 +20,16 @@ function Header() {
       icon: home,
       link: "/",
     },
+    {
+      name: "Tasks",
+      icon: "📋",
+      link: "/tasks",
+    },
+    {
+      name: "Leaderboard",
+      icon: "🏆",
+      link: "/leaderboard",
+    },
     ...(isTeacher 
       ? [
           {
@@ -28,9 +38,9 @@ function Header() {
             link: "/teacher",
           },
           {
-            name: "My Quizzes",
-            icon: "📝",
-            link: "/teacher/quizzes",
+            name: "Question Bank",
+            icon: "📚",
+            link: "/teacher/question-bank",
           },
         ]
       : [

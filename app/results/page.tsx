@@ -23,7 +23,7 @@ function page() {
   ).length;
 
   const totalQuestions = quizResponses.length;
-  const scorePercentage = (correctAnswers / totalQuestions) * 100;
+  const scorePercentage = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
 
   const toggleQuestionExpansion = (index: number) => {
     setExpandedQuestions(prev =>
@@ -87,8 +87,15 @@ function page() {
           <h2 className="text-2xl font-bold">Answer Review</h2>
           
           {quizResponses.map((response: any, index: number) => {
-            const question = filteredQuestions[index];
+            // Find the question that matches this response's questionId
+            const question = filteredQuestions.find((q: any) => q.id === response.questionId) || filteredQuestions[index];
             const isExpanded = expandedQuestions.includes(index);
+            
+            // Find the selected option from the question's options using optionId
+            const selectedOption = response.optionId 
+              ? question?.options?.find((opt: any) => opt.id === response.optionId)
+              : null;
+            const selectedOptionText = selectedOption?.text || 'No answer';
             
             return (
               <Card key={index} className="p-4">
@@ -98,14 +105,16 @@ function page() {
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      {response.isCorrect ? (
+                      {!response.optionId ? (
+                        <div className="w-5 h-5 rounded-full border-2 border-gray-400" />
+                      ) : response.isCorrect ? (
                         <CheckCircle className="w-5 h-5 text-green-500" />
                       ) : (
                         <XCircle className="w-5 h-5 text-red-500" />
                       )}
                       <span className="font-medium">Question {index + 1}</span>
-                      <span className={`text-sm ${response.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                        {response.isCorrect ? 'Correct' : 'Incorrect'}
+                      <span className={`text-sm ${!response.optionId ? 'text-gray-500' : response.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                        {!response.optionId ? 'Skipped' : response.isCorrect ? 'Correct' : 'Incorrect'}
                       </span>
                     </div>
                     <p className="mt-2 text-gray-700">{question?.text}</p>
@@ -121,12 +130,18 @@ function page() {
                   <div className="mt-4 pl-7 space-y-2">
                     <div>
                       <span className="font-medium text-sm text-gray-600">Your Answer: </span>
-                      <span className={response.isCorrect ? 'text-green-600' : 'text-red-600'}>
-                        {response.selectedOption?.text || response.textAnswer || 'No answer'}
+                      <span className={
+                        selectedOptionText === 'No answer' 
+                          ? 'text-gray-500 italic' 
+                          : response.isCorrect 
+                            ? 'text-green-600' 
+                            : 'text-red-600'
+                      }>
+                        {selectedOptionText}
                       </span>
                     </div>
                     
-                    {!response.isCorrect && (
+                    {(!response.isCorrect || !response.optionId) && (
                       <div>
                         <span className="font-medium text-sm text-gray-600">Correct Answer: </span>
                         <span className="text-green-600">

@@ -6,7 +6,18 @@ import QuizCard from "@/components/quiz/QuizCard";
 
 async function page({ params }: any) {
     const { categoryId } = await params;
-    const { userId } = await auth();
+
+    // Make auth optional since we don't need extra security
+    let userId = null;
+    try {
+        const authResult = await auth();
+        userId = authResult.userId;
+    } catch (error) {
+        // Auth failed, but we can continue without user ID
+        console.log(
+            "Auth not available, continuing without user authentication"
+        );
+    }
 
     if (!categoryId) {
         return (
@@ -66,7 +77,9 @@ async function page({ params }: any) {
 
         return (
             <div>
-                <h1 className="mb-6 text-4xl font-bold">{category.name} Quizzes</h1>
+                <h1 className="mb-6 text-4xl font-bold">
+                    {category.name} Quizzes
+                </h1>
 
                 {quizzes.length > 0 ? (
                     <div className="mb-8 grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-6">

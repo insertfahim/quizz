@@ -13,6 +13,7 @@ node_modules/
 /out/
 /build
 .next/
+next-env.d.ts
 
 # Production
 /dist
@@ -36,7 +37,6 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts
 
 # OS files
 .DS_Store
@@ -128,3 +128,8 @@ public/workbox-*.js
 
 # Storybook
 storybook-static/
+
+# Lock files (optional, depending on team preference)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

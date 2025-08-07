@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import prisma from "@/utils/connect";
+import { requireTeacher } from "@/utils/auth";
 
 // PUT update a question
 export async function PUT(
@@ -8,25 +8,7 @@ export async function PUT(
     { params }: { params: Promise<{ questionId: string }> }
 ) {
     try {
-        const { userId } = await auth();
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { clerkId: userId },
-        });
-
-        if (!user || user.role !== "teacher") {
-            return NextResponse.json(
-                { error: "Access denied" },
-                { status: 403 }
-            );
-        }
+        const user = await requireTeacher(req);
 
         const { questionId } = await params;
         const body = await req.json();
@@ -74,25 +56,7 @@ export async function DELETE(
     { params }: { params: Promise<{ questionId: string }> }
 ) {
     try {
-        const { userId } = await auth();
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { clerkId: userId },
-        });
-
-        if (!user || user.role !== "teacher") {
-            return NextResponse.json(
-                { error: "Access denied" },
-                { status: 403 }
-            );
-        }
+        const user = await requireTeacher(req);
 
         const { questionId } = await params;
         await prisma.questionBank.delete({

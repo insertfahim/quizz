@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/connect";
 import { requireAdmin } from "@/utils/auth";
 import { USER_ROLES } from "@/utils/roles";
+import bcrypt from "bcryptjs";
 
 export async function GET(req: NextRequest) {
     try {
@@ -79,12 +80,12 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const admin = await requireAdmin(req);
-        const { name, email, role, clerkId } = await req.json();
+        const { name, email, role, password } = await req.json();
 
         // Validate required fields
-        if (!name || !email || !role || !clerkId) {
+        if (!name || !email || !role || !password) {
             return NextResponse.json(
-                { error: "Name, email, role, and clerkId are required" },
+                { error: "Name, email, role, and password are required" },
                 { status: 400 }
             );
         }
@@ -97,24 +98,36 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Check if user already exists
+        // Validate password
+        if (password.length < 6) {
+            return NextResponse.json(
+                { error: "Password must be at least 6 characters" },
+                { status: 400 }
+            );
+        }
+
+        // Check if user already exists by email
         const existingUser = await prisma.user.findUnique({
-            where: { clerkId },
+            where: { email: email.toLowerCase() },
         });
 
         if (existingUser) {
             return NextResponse.json(
-                { error: "User already exists" },
+                { error: "User with this email already exists" },
                 { status: 409 }
             );
         }
 
+        // Hash password
+        const saltRounds = 12;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         // Create new user
         const newUser = await prisma.user.create({
             data: {
-                clerkId,
                 name,
-                email,
+                email: email.toLowerCase(),
+                password: hashedPassword,
                 role,
                 isActive: true,
             },
@@ -125,7 +138,9 @@ export async function POST(req: NextRequest) {
             `Admin ${admin.email} created user ${newUser.email} with role ${role}`
         );
 
-        return NextResponse.json(newUser);
+        // Remove password from response
+        const { password: _, ...userResponse } = newUser;
+        return NextResponse.json(userResponse);
     } catch (error: any) {
         console.error("Error creating user:", error);
         return NextResponse.json(

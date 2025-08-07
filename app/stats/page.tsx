@@ -1,18 +1,29 @@
-import { auth } from "@clerk/nextjs/server";
 import React from "react";
 import prisma from "@/utils/connect";
 import UserStats from "@/components/UserStats";
+import { getCurrentUser } from "@/utils/auth";
+import { cookies } from "next/headers";
 
 async function page() {
-    let userId = null;
+    let user = null;
     try {
-        const authResult = await auth();
-        userId = authResult.userId;
+        // Create a mock request object with cookies for server-side auth
+        const cookieStore = await cookies();
+        const authToken = cookieStore.get("auth-token");
+
+        if (authToken) {
+            const mockRequest = {
+                cookies: {
+                    get: (name: string) => ({ value: authToken.value }),
+                },
+            } as any;
+            user = await getCurrentUser(mockRequest);
+        }
     } catch (error) {
         console.log("Auth not available, showing guest stats");
     }
 
-    if (!userId) {
+    if (!user) {
         return (
             <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 text-center">
                 <h1 className="text-2xl">Please sign in to view your stats</h1>
@@ -23,10 +34,10 @@ async function page() {
         );
     }
 
-    // Get user data with quiz submissions
-    const user = await prisma.user.findUnique({
+    // Get user data with quiz submissions - user is already fetched above
+    const userWithSubmissions = await prisma.user.findUnique({
         where: {
-            clerkId: userId,
+            id: user.id,
         },
         include: {
             submissions: {
@@ -44,11 +55,11 @@ async function page() {
         },
     });
 
-    console.log("User stats:", user);
+    console.log("User stats:", userWithSubmissions);
 
     return (
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-            <UserStats userStats={user} />
+            <UserStats userStats={userWithSubmissions} />
         </div>
     );
 }

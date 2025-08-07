@@ -14,20 +14,7 @@
           "originalSource": "/:path*"
         }
       ],
-      "wasm": [
-        {
-          "name": "wasm_bb6b9b09565f3eaad0bc5191d66ad71607063552",
-          "filePath": "server/edge-chunks/wasm_bb6b9b09565f3eaad0bc5191d66ad71607063552.wasm"
-        },
-        {
-          "name": "wasm_1fea9f6885c078a31ae3fa84d3e04ae895e4985e",
-          "filePath": "server/edge-chunks/wasm_1fea9f6885c078a31ae3fa84d3e04ae895e4985e.wasm"
-        },
-        {
-          "name": "wasm_8adefae182ce4421e2e6bad9df5cf05041a6a257",
-          "filePath": "server/edge-chunks/wasm_8adefae182ce4421e2e6bad9df5cf05041a6a257.wasm"
-        }
-      ],
+      "wasm": [],
       "assets": [],
       "env": {
         "__NEXT_BUILD_ID": "development",

@@ -3,52 +3,10 @@ import React from "react";
 import prisma from "@/utils/connect";
 import { IQuiz } from "@/types/types";
 import QuizCard from "@/components/quiz/QuizCard";
-import { request } from "@arcjet/next";
-import { aj } from "@/lib/arcject";
-import Countdown from "@/components/Countdown";
 
 async function page({ params }: any) {
     const { categoryId } = await params;
     const { userId } = await auth();
-    const req = await request();
-
-    const decision = await aj.protect(req, {
-        userId: userId ?? "",
-        requested: 2,
-    });
-
-    if (decision.isDenied()) {
-        if (decision.reason.isRateLimit()) {
-            const resetTime = decision.reason?.resetTime;
-
-            if (!resetTime) {
-                return (
-                    <div>
-                        <h1>Rate limit exceeded</h1>
-                    </div>
-                );
-            }
-
-            // calculate the time left on the server
-            const currentTime = Date.now();
-            const resetTimestamp = new Date(resetTime).getTime();
-            const timeLeft = Math.max(
-                Math.ceil((resetTimestamp - currentTime) / 1000),
-                0
-            ); // convert to seconds
-
-            return (
-                <div className="flex flex-col items-center gap-2">
-                    <h1 className="text-4xl font-bold text-center text-red-400">
-                        Too many requests :(
-                    </h1>
-                    <p>You have exceeded the rate limit for this request.</p>
-
-                    <Countdown intitialTimeLeft={timeLeft} />
-                </div>
-            );
-        }
-    }
 
     if (!categoryId) {
         return null;

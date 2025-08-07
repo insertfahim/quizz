@@ -6,9 +6,9 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
-    title: "BRACU Task & Quiz Manager",
+    title: "Daily Task Planner | Online Progress App",
     description:
-        "Daily Task Planner and Quiz Management System for Brac University Students and Faculty",
+        "Comprehensive platform for quiz management, task planning, and progress tracking. Designed for students, teachers, and administrators.",
 };
 
 const nunito = Nunito({
@@ -40,9 +40,7 @@ export default function RootLayout({
                 <AuthProvider>
                     <Toaster position="top-center" />
                     <Header />
-                    <main className="py-8 mx-[15rem] xl:mx-[25rem] h-full">
-                        {children}
-                    </main>
+                    <main className="min-h-screen">{children}</main>
                 </AuthProvider>
             </body>
         </html>

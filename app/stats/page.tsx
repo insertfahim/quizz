@@ -14,7 +14,7 @@ async function page() {
 
     if (!userId) {
         return (
-            <div className="text-center mt-8">
+            <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 text-center">
                 <h1 className="text-2xl">Please sign in to view your stats</h1>
                 <p className="mt-2 text-gray-600">
                     Sign in to track your quiz progress and performance
@@ -47,7 +47,7 @@ async function page() {
     console.log("User stats:", user);
 
     return (
-        <div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
             <UserStats userStats={user} />
         </div>
     );

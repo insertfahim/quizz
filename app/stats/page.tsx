@@ -1,5 +1,4 @@
 import { auth } from "@clerk/nextjs/server";
-import { error } from "console";
 import React from "react";
 import prisma from "@/utils/connect";
 import UserStats from "@/components/UserStats";
@@ -24,16 +23,22 @@ async function page() {
         );
     }
 
-    // get user data --> populate the categoryStats using the category
-
+    // Get user data with quiz submissions
     const user = await prisma.user.findUnique({
         where: {
             clerkId: userId,
         },
         include: {
-            categoryStats: {
+            submissions: {
                 include: {
-                    category: true, // populate the category
+                    quiz: {
+                        select: {
+                            title: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    submittedAt: "desc",
                 },
             },
         },

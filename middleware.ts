@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/utils/roles";
 
 export const config = {
     matcher: [
@@ -24,6 +25,12 @@ const isPublicRoute = createRouteMatcher([
     "/tasks(.*)",
 ]);
 
+// define admin routes
+const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
+
+// define teacher routes
+const isTeacherRoute = createRouteMatcher(["/teacher(.*)", "/api/teacher(.*)"]);
+
 export default clerkMiddleware(async (auth, req) => {
     // skip authentication for public routes
     if (isPublicRoute(req)) {
@@ -32,6 +39,24 @@ export default clerkMiddleware(async (auth, req) => {
 
     // authenticate user and protect non-public routes
     await auth.protect();
+
+    // check role-based access for protected routes
+    try {
+        if (isAdminRoute(req)) {
+            const user = await getCurrentUser();
+            if (!user || user.role !== "admin") {
+                return NextResponse.redirect(new URL("/", req.url));
+            }
+        } else if (isTeacherRoute(req)) {
+            const user = await getCurrentUser();
+            if (!user || (user.role !== "teacher" && user.role !== "admin")) {
+                return NextResponse.redirect(new URL("/", req.url));
+            }
+        }
+    } catch (error) {
+        console.log("Error checking user role in middleware:", error);
+        // Continue to allow access if role check fails (fallback to component-level protection)
+    }
 
     return NextResponse.next();
 });

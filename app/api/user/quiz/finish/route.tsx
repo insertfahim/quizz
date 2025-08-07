@@ -13,15 +13,10 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const { categoryId, quizId, score, responses } = await req.json();
+        const { quizId, score, responses } = await req.json();
 
         // validate the fields
-        if (
-            !categoryId ||
-            !quizId ||
-            typeof score !== "number" ||
-            !Array.isArray(responses)
-        ) {
+        if (!quizId || typeof score !== "number" || !Array.isArray(responses)) {
             return NextResponse.json(
                 { error: "Invalid request" },
                 { status: 400 }
@@ -36,49 +31,10 @@ export async function POST(req: NextRequest) {
                 throw new Error("User not found");
             }
 
-            // fetch or create a categoryStat entry
-            let stat = await tx.categoryStat.findUnique({
-                where: {
-                    userId_categoryId: {
-                        userId: user.id,
-                        categoryId,
-                    },
-                },
-            });
-
-            if (stat) {
-                // calculate the average score
-                const totalScore =
-                    (stat.averageScore || 0) * stat.completed + score;
-                const newAverageScore = totalScore / (stat.completed + 1);
-
-                // update the categoryStat entry
-                stat = await tx.categoryStat.update({
-                    where: { id: stat.id },
-                    data: {
-                        completed: stat.completed + 1,
-                        averageScore: newAverageScore,
-                        lastAttempt: new Date(),
-                    },
-                });
-            } else {
-                // create a new categoryStat entry
-                // Note: attempts should already be incremented when quiz starts
-                // If this is the first time, set attempts to 1
-                stat = await tx.categoryStat.create({
-                    data: {
-                        userId: user.id,
-                        categoryId,
-                        attempts: 1,
-                        completed: 1,
-                        averageScore: score,
-                        lastAttempt: new Date(),
-                    },
-                });
-            }
-
             // Calculate correct answers count
-            const correctAnswers = responses.filter((r: any) => r.isCorrect).length;
+            const correctAnswers = responses.filter(
+                (r: any) => r.isCorrect
+            ).length;
             const totalQuestions = responses.length;
 
             // Check if submission already exists (for retakes)
@@ -94,29 +50,29 @@ export async function POST(req: NextRequest) {
             // Create or update QuizSubmission record
             const submission = existingSubmission
                 ? await tx.quizSubmission.update({
-                    where: {
-                        userId_quizId: {
-                            userId: user.id,
-                            quizId,
-                        },
-                    },
-                    data: {
-                        score,
-                        totalQuestions,
-                        correctAnswers,
-                        submittedAt: new Date(),
-                    },
-                })
+                      where: {
+                          userId_quizId: {
+                              userId: user.id,
+                              quizId,
+                          },
+                      },
+                      data: {
+                          score,
+                          totalQuestions,
+                          correctAnswers,
+                          submittedAt: new Date(),
+                      },
+                  })
                 : await tx.quizSubmission.create({
-                    data: {
-                        userId: user.id,
-                        quizId,
-                        score,
-                        totalQuestions,
-                        correctAnswers,
-                        submittedAt: new Date(),
-                    },
-                });
+                      data: {
+                          userId: user.id,
+                          quizId,
+                          score,
+                          totalQuestions,
+                          correctAnswers,
+                          submittedAt: new Date(),
+                      },
+                  });
 
             // If updating submission, delete old answers first
             if (existingSubmission) {
@@ -141,7 +97,7 @@ export async function POST(req: NextRequest) {
                 });
             }
 
-            return { stat, submission };
+            return { submission };
         });
 
         return NextResponse.json(result);

@@ -16,27 +16,24 @@ datasource db {
 model User {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   clerkId       String   @unique
-  role          String   @default("student") // student, teacher
+  role          String   @default("student") // student, teacher, admin
   name          String?
   email         String?
   bio           String?
   profileImage  String?
-  categoryStats CategoryStat[]
+  isActive      Boolean  @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   createdQuizzes Quiz[]  @relation("QuizCreator")
   submissions   QuizSubmission[]
   tasks         Task[]
   notifications Notification[]
   questionBanks QuestionBank[]
+  auditLogs     AuditLog[]
 }
 
-model Category{
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String   
-  description   String?
-  image         String?
-  quizzes       Quiz[]
-  categoryStats CategoryStat[] // reseve relation to CategoryStat
-}
+
 
 model Quiz {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -47,8 +44,6 @@ model Quiz {
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  categoryId      String    @db.ObjectId
-  category        Category  @relation(fields: [categoryId], references: [id])
   creatorId       String?   @db.ObjectId
   creator         User?     @relation("QuizCreator", fields: [creatorId], references: [id])
   questions       Question[]
@@ -77,19 +72,7 @@ model Option{
 }
 
 
-model CategoryStat {
-  id            String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String   @db.ObjectId
-  user          User     @relation(fields: [userId], references: [id])
-  categoryId    String   @db.ObjectId
-  category      Category @relation(fields: [categoryId], references: [id])
-  attempts      Int @default(0) // Total attempts in this category
-  completed     Int @default(0) // Total completed quizzes in this category
-  averageScore  Float? 
-  lastAttempt   DateTime? // Last attempt in this category
 
-  @@unique([userId, categoryId])
-}
 
 model QuizSubmission {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -164,4 +147,16 @@ model QuestionBank {
   correctAnswer String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+// Audit Log Model for Admin Actions
+model AuditLog {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  action        String   // user_created, user_updated, user_deleted, quiz_moderated, etc.
+  targetType    String   // user, quiz, question, task
+  targetId      String?  @db.ObjectId
+  details       Json?    // Additional details about the action
+  adminId       String   @db.ObjectId
+  admin         User     @relation(fields: [adminId], references: [id])
+  createdAt     DateTime @default(now())
 }

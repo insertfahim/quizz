@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import useCategories from "./useCategories";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 
 const GlobalContext = React.createContext();
 
 export const GlobalContextProvider = ({ children }) => {
-    const { loading, categories } = useCategories();
     const { user, isLoaded } = useUser();
 
     const [dbUser, setDbUser] = useState(null);
@@ -14,7 +12,6 @@ export const GlobalContextProvider = ({ children }) => {
 
     const [quizSetup, setQuizSetup] = React.useState({
         questionCount: 1,
-        category: null,
         difficulty: null,
     });
     const [selectedQuiz, setSelectedQuiz] = React.useState(null);
@@ -70,12 +67,14 @@ export const GlobalContextProvider = ({ children }) => {
     return (
         <GlobalContext.Provider
             value={{
-                loading: loading || userLoading,
-                categories,
+                loading: userLoading,
                 user: dbUser,
                 userRole: dbUser?.role,
                 isTeacher: dbUser?.role === "teacher",
                 isStudent: dbUser?.role === "student",
+                isAdmin: dbUser?.role === "admin",
+                hasElevatedPrivileges:
+                    dbUser?.role === "admin" || dbUser?.role === "teacher",
                 updateUserRole,
                 quizSetup,
                 setQuizSetup,

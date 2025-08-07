@@ -5,7 +5,6 @@ import Loader from "./Loader";
 import Image from "next/image";
 import { formatTime } from "@/utils/formatTime";
 import { checkAbc, crosshairs } from "@/utils/Icons";
-import CategoryBarChart from "./CategoryBarChart";
 import {
     Table,
     TableBody,
@@ -14,9 +13,25 @@ import {
     TableHeader,
     TableRow,
 } from "./ui/table";
-import { ICategoryStats } from "@/types/types";
 
-function UserStats({ userStats }: any) {
+interface QuizSubmission {
+    id: string;
+    score: number;
+    totalQuestions: number;
+    correctAnswers: number;
+    submittedAt: string | Date;
+    quiz: {
+        title: string;
+    };
+}
+
+interface UserStatsProps {
+    userStats: {
+        submissions: QuizSubmission[];
+    } | null;
+}
+
+function UserStats({ userStats }: UserStatsProps) {
     const { user, isLoaded } = useUser();
 
     if (!isLoaded) {
@@ -24,7 +39,11 @@ function UserStats({ userStats }: any) {
     }
 
     // Handle case where userStats is null or undefined
-    if (!userStats || !userStats.categoryStats) {
+    if (
+        !userStats ||
+        !userStats.submissions ||
+        userStats.submissions.length === 0
+    ) {
         return (
             <div className="flex flex-col gap-4">
                 <div className="h-[15rem] px-8 flex items-center justify-center border-2 rounded-xl shadow-[0_.3rem_0_0_rgba(0,0,0,0.1)]">
@@ -47,35 +66,24 @@ function UserStats({ userStats }: any) {
         );
     }
 
-    // get the most recent attempt date
-    const recentAttemptDate = userStats.categoryStats.reduce(
-        (acc: any, curr: any) => {
-            const currentDate = new Date(curr.lastAttempt);
-            return currentDate > acc ? currentDate : acc;
-        },
-        new Date(0)
+    // Calculate stats from submissions
+    const submissions = userStats.submissions;
+    const totalAttempts = submissions.length;
+    const averageScore =
+        submissions.reduce((acc, submission) => acc + submission.score, 0) /
+        totalAttempts;
+    const recentAttemptDate = new Date(
+        Math.max(...submissions.map((s) => new Date(s.submittedAt).getTime()))
     );
 
-    const totalAttempts = userStats.categoryStats.reduce(
-        (acc: number, curr: any) => acc + curr.attempts,
-        0
-    );
-
-    const totalCompleted = userStats.categoryStats.reduce(
-        (acc: number, curr: any) => acc + curr.completed,
-        0
-    );
-    // show the 2 most recent attempts
-    const latestStats = userStats.categoryStats
-        .slice(-2)
-        .sort((a: any, b: any) => {
-            return (
-                new Date(b.lastAttempt).getTime() -
-                new Date(a.lastAttempt).getTime()
-            );
-        });
-
-    console.log("User stats:", userStats.categoryStats);
+    // Get latest submissions (up to 5)
+    const latestSubmissions = submissions
+        .sort(
+            (a, b) =>
+                new Date(b.submittedAt).getTime() -
+                new Date(a.submittedAt).getTime()
+        )
+        .slice(0, 5);
 
     return (
         <div className="flex flex-col gap-4">
@@ -92,7 +100,7 @@ function UserStats({ userStats }: any) {
             <div className="mt-4">
                 <h1 className="font-bold text-2xl">Overview</h1>
                 <p className="text-muted-foreground">
-                    A summary of your recent activity and performance
+                    A summary of your recent quiz activity and performance
                 </p>
             </div>
 
@@ -120,27 +128,18 @@ function UserStats({ userStats }: any) {
                 <div className="py-4 px-4 flex gap-2 border-2 rounded-lg shadow-[0_.3rem_0_0_rgba(0,0,0,0.1)]">
                     <div className="text-2xl text-blue-400">{checkAbc}</div>
                     <div>
-                        <p className="font-bold">Total Completed</p>
+                        <p className="font-bold">Average Score</p>
                         <p className="mt-2 font-bold text-3xl">
-                            {totalCompleted}
+                            {averageScore.toFixed(1)}
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div className="mt-2 grid grid-cols-2 gap-6">
-                {latestStats?.map((category: any) => (
-                    <CategoryBarChart
-                        key={category.id}
-                        categoryData={category}
-                    />
-                ))}
-            </div>
-
             <div className="mt-4">
-                <h1 className="font-bold text-2xl">Detailed Category Stats</h1>
+                <h1 className="font-bold text-2xl">Recent Quiz Attempts</h1>
                 <p className="text-muted-foreground">
-                    Breakdown of performance by category
+                    Your latest quiz submissions
                 </p>
             </div>
 
@@ -148,33 +147,35 @@ function UserStats({ userStats }: any) {
                 <Table>
                     <TableHeader className="text-base font-semibold">
                         <TableRow>
-                            <TableHead className="py-4">Category</TableHead>
-                            <TableHead>Attempts</TableHead>
-                            <TableHead>Completed</TableHead>
-                            <TableHead>Average Score</TableHead>
-                            <TableHead>Last Attempt</TableHead>
+                            <TableHead className="py-4">Quiz</TableHead>
+                            <TableHead>Score</TableHead>
+                            <TableHead>Questions</TableHead>
+                            <TableHead>Correct</TableHead>
+                            <TableHead>Date</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {userStats.categoryStats.map(
-                            (category: ICategoryStats) => (
-                                <TableRow key={category.id}>
-                                    <TableCell className="font-semibold py-4">
-                                        {category.category.name}
-                                    </TableCell>
-                                    <TableCell>{category.attempts}</TableCell>
-                                    <TableCell>{category.completed}</TableCell>
-                                    <TableCell>
-                                        {category.averageScore !== null
-                                            ? category.averageScore.toFixed(2)
-                                            : "N/A"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {formatTime(category.lastAttempt)}
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        )}
+                        {latestSubmissions.map((submission) => (
+                            <TableRow key={submission.id}>
+                                <TableCell className="font-semibold py-4">
+                                    {submission.quiz.title}
+                                </TableCell>
+                                <TableCell>
+                                    {submission.score.toFixed(1)}
+                                </TableCell>
+                                <TableCell>
+                                    {submission.totalQuestions}
+                                </TableCell>
+                                <TableCell>
+                                    {submission.correctAnswers}
+                                </TableCell>
+                                <TableCell>
+                                    {formatTime(
+                                        new Date(submission.submittedAt)
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </div>

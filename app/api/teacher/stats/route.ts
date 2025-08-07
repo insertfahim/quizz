@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
             select: { id: true },
         });
 
-        const quizIds = teacherQuizzes.map(quiz => quiz.id);
+        const quizIds = teacherQuizzes.map((quiz) => quiz.id);
 
         // Get comprehensive statistics
         const [
@@ -21,9 +21,8 @@ export async function GET(req: NextRequest) {
             activeQuizzes,
             totalSubmissions,
             totalStudents,
-            categoryStats,
             recentSubmissions,
-            averageScores
+            averageScores,
         ] = await Promise.all([
             // Total quizzes created
             prisma.quiz.count({
@@ -32,9 +31,9 @@ export async function GET(req: NextRequest) {
 
             // Active quizzes
             prisma.quiz.count({
-                where: { 
+                where: {
                     creatorId: teacher.id,
-                    isActive: true 
+                    isActive: true,
                 },
             }),
 
@@ -44,23 +43,13 @@ export async function GET(req: NextRequest) {
             }),
 
             // Unique students who attempted teacher's quizzes
-            prisma.quizSubmission.findMany({
-                where: { quizId: { in: quizIds } },
-                select: { userId: true },
-                distinct: ['userId'],
-            }).then(submissions => submissions.length),
-
-            // Quiz statistics by category
-            prisma.quiz.groupBy({
-                by: ['categoryId'],
-                where: { creatorId: teacher.id },
-                _count: {
-                    id: true,
-                },
-                _avg: {
-                    timeLimit: true,
-                },
-            }),
+            prisma.quizSubmission
+                .findMany({
+                    where: { quizId: { in: quizIds } },
+                    select: { userId: true },
+                    distinct: ["userId"],
+                })
+                .then((submissions) => submissions.length),
 
             // Recent submissions (last 10)
             prisma.quizSubmission.findMany({
@@ -79,14 +68,14 @@ export async function GET(req: NextRequest) {
                     },
                 },
                 orderBy: {
-                    submittedAt: 'desc',
+                    submittedAt: "desc",
                 },
                 take: 10,
             }),
 
             // Average scores by quiz
             prisma.quizSubmission.groupBy({
-                by: ['quizId'],
+                by: ["quizId"],
                 where: { quizId: { in: quizIds } },
                 _avg: {
                     score: true,
@@ -97,20 +86,6 @@ export async function GET(req: NextRequest) {
             }),
         ]);
 
-        // Get category names for category stats
-        const categoriesWithNames = await Promise.all(
-            categoryStats.map(async (stat) => {
-                const category = await prisma.category.findUnique({
-                    where: { id: stat.categoryId },
-                    select: { name: true },
-                });
-                return {
-                    ...stat,
-                    categoryName: category?.name || 'Unknown',
-                };
-            })
-        );
-
         // Get quiz names for average scores
         const averageScoresWithNames = await Promise.all(
             averageScores.map(async (score) => {
@@ -120,7 +95,7 @@ export async function GET(req: NextRequest) {
                 });
                 return {
                     ...score,
-                    quizTitle: quiz?.title || 'Unknown',
+                    quizTitle: quiz?.title || "Unknown",
                 };
             })
         );
@@ -132,7 +107,6 @@ export async function GET(req: NextRequest) {
                 totalSubmissions,
                 totalStudents,
             },
-            categoryBreakdown: categoriesWithNames,
             recentSubmissions,
             averageScores: averageScoresWithNames,
         };

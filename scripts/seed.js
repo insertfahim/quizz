@@ -1,189 +1,129 @@
 const { PrismaClient } = require("@prisma/client");
 
-// Import question data
-const programmingQuestions = require("../data/programmingQuestions.js");
-const biologyQuestions = require("../data/biologyQuestions.js");
-const chemistryQuestions = require("../data/chemistryQuestions.js");
-const csQuestions = require("../data/csQuestions.js");
-const dsQuestions = require("../data/dsQuestions.js");
-const physicsQuestions = require("../data/physicsQuestions.js");
-
 const prisma = new PrismaClient();
 
-// Categories data
-const categories = [
+// Simple quiz data for basic seeding
+const quizzes = [
     {
-        name: "Science",
-        description:
-            "Science is the pursuit and application of knowledge and understanding of the natural and social world following a systematic methodology based on evidence.",
+        title: "General Knowledge Quiz",
+        description: "Test your general knowledge with these questions",
+        timeLimit: 15,
+        questions: [
+            {
+                text: "What is the capital of France?",
+                difficulty: "easy",
+                type: "multiple_choice",
+                explanation: "Paris is the capital and largest city of France.",
+                options: [
+                    { text: "London", isCorrect: false },
+                    { text: "Berlin", isCorrect: false },
+                    { text: "Paris", isCorrect: true },
+                    { text: "Madrid", isCorrect: false },
+                ],
+            },
+            {
+                text: "Which planet is known as the Red Planet?",
+                difficulty: "easy",
+                type: "multiple_choice",
+                explanation:
+                    "Mars is called the Red Planet due to its reddish appearance.",
+                options: [
+                    { text: "Venus", isCorrect: false },
+                    { text: "Mars", isCorrect: true },
+                    { text: "Jupiter", isCorrect: false },
+                    { text: "Saturn", isCorrect: false },
+                ],
+            },
+        ],
     },
     {
-        name: "Technology",
-        description: "Dive into the latest technological advancements.",
-    },
-    {
-        name: "Programming",
-        description: "Learn about coding and software development.",
-    },
-    {
-        name: "Computer Science",
-        description: "Understand the fundamentals of computers and algorithms.",
-    },
-    {
-        name: "Mathematics",
-        description: "Master the language of numbers and patterns.",
-    },
-    {
-        name: "History",
-        description: "Discover the events that shaped our world.",
-    },
-    {
-        name: "Art",
-        description: "Appreciate creativity through various forms of art.",
-    },
-    {
-        name: "Geography",
-        description: "Explore the physical features of our planet.",
-    },
-    {
-        name: "Physics",
-        description: "Unravel the laws governing the universe.",
-    },
-    {
-        name: "Biology",
-        description: "Study the science of living organisms.",
+        title: "Quick Math Quiz",
+        description: "Basic mathematics questions",
+        timeLimit: 10,
+        questions: [
+            {
+                text: "What is 15 + 27?",
+                difficulty: "easy",
+                type: "multiple_choice",
+                explanation: "15 + 27 = 42",
+                options: [
+                    { text: "40", isCorrect: false },
+                    { text: "42", isCorrect: true },
+                    { text: "44", isCorrect: false },
+                    { text: "46", isCorrect: false },
+                ],
+            },
+        ],
     },
 ];
 
 async function main() {
-    console.log("🌱 Starting database seeding...");
+    console.log("🌱 Starting basic database seeding...");
 
     try {
-        // Clear existing data (optional - comment out if you want to keep existing data)
-        console.log("🧹 Cleaning existing data...");
-        await prisma.option.deleteMany();
-        await prisma.question.deleteMany();
-        await prisma.quiz.deleteMany();
-        await prisma.categoryStat.deleteMany();
-        await prisma.category.deleteMany();
-        await prisma.user.deleteMany();
+        // Optional: Clear existing data
+        const clearData = process.argv.includes("--clear");
 
-        // 1. Seed Categories
-        console.log("📂 Seeding categories...");
-        const createdCategories = [];
-        for (const category of categories) {
-            const createdCategory = await prisma.category.create({
-                data: category,
-            });
-            createdCategories.push(createdCategory);
-            console.log(`✅ Created category: ${createdCategory.name}`);
+        if (clearData) {
+            console.log("🧹 Clearing existing data...");
+            await prisma.quizAnswer.deleteMany();
+            await prisma.option.deleteMany();
+            await prisma.question.deleteMany();
+            await prisma.quizSubmission.deleteMany();
+            await prisma.quiz.deleteMany();
+            console.log("✅ Existing data cleared");
         }
 
-        // 2. Seed Quizzes
         console.log("📝 Seeding quizzes...");
-        const quizzes = [
-            {
-                title: "Computer Science Basics",
-                description:
-                    "A quiz about fundamental computer science concepts.",
-                categoryName: "Computer Science",
-                questions: csQuestions,
-            },
-            {
-                title: "Programming Fundamentals",
-                description:
-                    "Test your knowledge of basic programming concepts.",
-                categoryName: "Programming",
-                questions: programmingQuestions,
-            },
-            {
-                title: "Data Structures",
-                description: "Assess your understanding of data structures.",
-                categoryName: "Computer Science",
-                questions: dsQuestions,
-            },
-            {
-                title: "Physics",
-                description: "Test your knowledge of physics",
-                categoryName: "Physics",
-                questions: physicsQuestions,
-            },
-            {
-                title: "Biology",
-                description: "Test your knowledge of biology",
-                categoryName: "Biology",
-                questions: biologyQuestions,
-            },
-            {
-                title: "Chemistry",
-                description: "Test your knowledge of chemistry",
-                categoryName: "Science",
-                questions: chemistryQuestions,
-            },
-        ];
+        let totalQuizzesCreated = 0;
 
-        const createdQuizzes = [];
         for (const quiz of quizzes) {
-            const category = createdCategories.find(
-                (cat) => cat.name === quiz.categoryName
-            );
-            if (!category) {
-                console.log(`❌ Category not found for quiz: ${quiz.title}`);
+            // Check if quiz already exists
+            const existingQuiz = await prisma.quiz.findFirst({
+                where: { title: quiz.title },
+            });
+
+            if (existingQuiz) {
+                console.log(`⏭️  Quiz already exists: ${quiz.title}`);
                 continue;
             }
 
+            // Create the quiz
             const createdQuiz = await prisma.quiz.create({
                 data: {
                     title: quiz.title,
                     description: quiz.description,
-                    categoryId: category.id,
+                    timeLimit: quiz.timeLimit,
+                    isActive: true,
                 },
             });
+            totalQuizzesCreated++;
 
-            createdQuizzes.push({ ...createdQuiz, questions: quiz.questions });
-            console.log(`✅ Created quiz: ${createdQuiz.title}`);
-        }
-
-        // 3. Seed Questions and Options
-        console.log("❓ Seeding questions and options...");
-        for (const quiz of createdQuizzes) {
-            if (!quiz.questions || quiz.questions.length === 0) {
-                console.log(`⚠️ No questions found for quiz: ${quiz.title}`);
-                continue;
-            }
-
+            // Create questions
             for (const question of quiz.questions) {
-                const createdQuestion = await prisma.question.create({
+                await prisma.question.create({
                     data: {
                         text: question.text,
-                        quizId: quiz.id,
+                        quizId: createdQuiz.id,
                         difficulty: question.difficulty,
+                        explanation: question.explanation,
+                        type: question.type,
                         options: {
                             create: question.options,
                         },
                     },
                 });
-                console.log(
-                    `✅ Created question: ${createdQuestion.text.substring(
-                        0,
-                        50
-                    )}...`
-                );
             }
+
+            console.log(
+                `✅ Created quiz: ${quiz.title} with ${quiz.questions.length} questions`
+            );
         }
 
-        console.log("🎉 Database seeding completed successfully!");
-        console.log(`📊 Summary:`);
-        console.log(`   - Categories: ${createdCategories.length}`);
-        console.log(`   - Quizzes: ${createdQuizzes.length}`);
-
-        // Count total questions
-        const totalQuestions = await prisma.question.count();
-        const totalOptions = await prisma.option.count();
-        console.log(`   - Questions: ${totalQuestions}`);
-        console.log(`   - Options: ${totalOptions}`);
+        console.log("\n🎉 Basic seeding completed!");
+        console.log(`📊 Created ${totalQuizzesCreated} new quizzes`);
     } catch (error) {
-        console.error("❌ Error during seeding:", error);
+        console.error("\n❌ Error during seeding:", error);
         throw error;
     }
 }

@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
         const quizzes = await prisma.quiz.findMany({
             where: { creatorId: teacher.id },
             include: {
-                category: true,
                 questions: {
                     include: {
                         options: true,
@@ -52,25 +51,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const teacher = await requireTeacher();
-        const { title, description, categoryId, timeLimit, questions } = await req.json();
+        const { title, description, timeLimit, questions } = await req.json();
 
         // Validate required fields
-        if (!title || !categoryId || !questions || questions.length === 0) {
+        if (!title || !questions || questions.length === 0) {
             return NextResponse.json(
-                { error: "Title, category, and at least one question are required" },
+                { error: "Title and at least one question are required" },
                 { status: 400 }
-            );
-        }
-
-        // Validate category exists
-        const category = await prisma.category.findUnique({
-            where: { id: categoryId },
-        });
-
-        if (!category) {
-            return NextResponse.json(
-                { error: "Category not found" },
-                { status: 404 }
             );
         }
 
@@ -79,7 +66,6 @@ export async function POST(req: NextRequest) {
             data: {
                 title,
                 description,
-                categoryId,
                 timeLimit,
                 creatorId: teacher.id,
                 questions: {
@@ -95,7 +81,6 @@ export async function POST(req: NextRequest) {
                 },
             },
             include: {
-                category: true,
                 questions: {
                     include: {
                         options: true,

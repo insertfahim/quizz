@@ -5,11 +5,11 @@ import { canManageQuiz, requireTeacher } from "@/utils/roles";
 // GET /api/teacher/quizzes/[quizId] - Get specific quiz with detailed information
 export async function GET(
     req: NextRequest,
-    { params }: { params: { quizId: string } }
+    { params }: { params: Promise<{ quizId: string }> }
 ) {
     try {
         await requireTeacher();
-        const { quizId } = params;
+        const { quizId } = await params;
 
         if (!(await canManageQuiz(quizId))) {
             return NextResponse.json(
@@ -21,7 +21,6 @@ export async function GET(
         const quiz = await prisma.quiz.findUnique({
             where: { id: quizId },
             include: {
-                category: true,
                 creator: {
                     select: {
                         name: true,
@@ -93,11 +92,11 @@ export async function GET(
 // PUT /api/teacher/quizzes/[quizId] - Update quiz
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { quizId: string } }
+    { params }: { params: Promise<{ quizId: string }> }
 ) {
     try {
         await requireTeacher();
-        const { quizId } = params;
+        const { quizId } = await params;
 
         if (!(await canManageQuiz(quizId))) {
             return NextResponse.json(
@@ -118,7 +117,6 @@ export async function PUT(
                 updatedAt: new Date(),
             },
             include: {
-                category: true,
                 questions: {
                     include: {
                         options: true,
@@ -146,11 +144,11 @@ export async function PUT(
 // DELETE /api/teacher/quizzes/[quizId] - Delete quiz
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { quizId: string } }
+    { params }: { params: Promise<{ quizId: string }> }
 ) {
     try {
         await requireTeacher();
-        const { quizId } = params;
+        const { quizId } = await params;
 
         if (!(await canManageQuiz(quizId))) {
             return NextResponse.json(
@@ -166,7 +164,9 @@ export async function DELETE(
 
         if (submissionCount > 0) {
             return NextResponse.json(
-                { error: "Cannot delete quiz with existing submissions. Deactivate instead." },
+                {
+                    error: "Cannot delete quiz with existing submissions. Deactivate instead.",
+                },
                 { status: 400 }
             );
         }

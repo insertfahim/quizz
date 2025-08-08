@@ -229,15 +229,15 @@ Mermaid flow – Middleware
 
 ```mermaid
 flowchart TD
-  A[Request] --> B{Public route?}
-  B -->|Yes| C[Allow]
-  B -->|No| D[Resolve user (getCurrentUser)]
-  D -->|No user| E[Redirect to /login]
-  D -->|User| F{Admin/Teacher path?}
-  F -->|Admin path| G{Role is admin?}
+  A["Request"] --> B{"Public route?"}
+  B -->|Yes| C["Allow"]
+  B -->|No| D["Resolve user (getCurrentUser)"]
+  D -->|No user| E["Redirect to /login"]
+  D -->|User| F{"Admin/Teacher path?"}
+  F -->|Admin path| G{"Role is admin?"}
   G -->|Yes| C
-  G -->|No| H[Redirect to /]
-  F -->|Teacher path| I{Role is teacher or admin?}
+  G -->|No| H["Redirect to /"]
+  F -->|Teacher path| I{"Role is teacher or admin?"}
   I -->|Yes| C
   I -->|No| H
 ```

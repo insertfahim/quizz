@@ -193,9 +193,34 @@ export async function DELETE(
             );
         }
 
-        // Delete user (cascade deletes will handle related records)
-        await prisma.user.delete({
-            where: { id: userId },
+        // Collect quizzes created by this user
+        const createdQuizzes = await prisma.quiz.findMany({
+            where: { creatorId: userId },
+            select: { id: true },
+        });
+
+        // Perform cleanup in a transaction
+        await prisma.$transaction(async (tx) => {
+            // For each created quiz: delete submissions (answers cascade), assignments, then the quiz (questions/options cascade)
+            for (const { id: qid } of createdQuizzes) {
+                await tx.quizSubmission.deleteMany({ where: { quizId: qid } });
+                await tx.quizAssignment.deleteMany({ where: { quizId: qid } });
+                await tx.quiz.delete({ where: { id: qid } });
+            }
+
+            // Delete all of the user's own data
+            await tx.quizSubmission.deleteMany({ where: { userId: userId } });
+            await tx.quizAssignment.deleteMany({
+                where: {
+                    OR: [{ studentId: userId }, { assignedById: userId }],
+                },
+            });
+            await tx.task.deleteMany({ where: { userId: userId } });
+            await tx.notification.deleteMany({ where: { userId: userId } });
+            await tx.questionBank.deleteMany({ where: { creatorId: userId } });
+
+            // Finally delete the user
+            await tx.user.delete({ where: { id: userId } });
         });
 
         // TODO: Create audit log functionality if needed

@@ -103,43 +103,7 @@ function page() {
                 return;
             }
 
-            // Allow unassigned flow for featured quizzes when the flag is set by setup
-            const unassignedFlag = localStorage.getItem(
-                "allowUnassignedQuizStart"
-            );
-            const isUnassignedForThisQuiz = unassignedFlag === quiz.id;
-            if (!isUnassignedForThisQuiz) {
-                try {
-                    const res = await axios.get("/api/user/assignments");
-                    const list = Array.isArray(res.data) ? res.data : [];
-                    const assigned = list.some(
-                        (a: any) =>
-                            a.quizId === quiz.id &&
-                            ["assigned", "in_progress"].includes(a.status)
-                    );
-                    if (!assigned) {
-                        const onceKey = "quizAccessToastShown";
-                        const shown = sessionStorage.getItem(onceKey);
-                        if (!shown) {
-                            toast.error("This quiz is not assigned to you.");
-                            sessionStorage.setItem(onceKey, "1");
-                        }
-                        clearSessionAndRedirect();
-                        return;
-                    }
-                } catch (e) {
-                    const onceKey = "quizAccessToastShown";
-                    const shown = sessionStorage.getItem(onceKey);
-                    if (!shown) {
-                        toast.error(
-                            "Failed to verify assignment. Please start from quiz setup."
-                        );
-                        sessionStorage.setItem(onceKey, "1");
-                    }
-                    clearSessionAndRedirect();
-                    return;
-                }
-            }
+            // Assignment logic removed – any signed-in student can take quizzes
 
             setSelectedQuiz(quiz);
             setQuizSetup(setup);
@@ -294,23 +258,16 @@ function page() {
         const score = total > 0 ? (correct / total) * 100 : 0;
 
         try {
-            // If this is a featured/unassigned attempt, skip server submission
-            const unassignedFlag = localStorage.getItem(
-                "allowUnassignedQuizStart"
-            );
-            const isUnassignedForThisQuiz = unassignedFlag === selectedQuiz.id;
-
-            if (!isUnassignedForThisQuiz) {
-                if (user) {
-                    const res = await axios.post("/api/user/quiz/finish", {
-                        quizId: selectedQuiz.id,
-                        score,
-                        responses,
-                    });
-                    console.log("Quiz finished:", res.data);
-                } else {
-                    toast("Results not saved. Sign in to track your progress.");
-                }
+            // Assignment logic removed – if user exists, save result
+            if (user) {
+                const res = await axios.post("/api/user/quiz/finish", {
+                    quizId: selectedQuiz.id,
+                    score,
+                    responses,
+                });
+                console.log("Quiz finished:", res.data);
+            } else {
+                toast("Results not saved. Sign in to track your progress.");
             }
         } catch (error) {
             console.log("Error finishing quiz:", error);

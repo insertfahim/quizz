@@ -117,14 +117,22 @@ export default function LoginPage() {
 
                     <div className="mt-4 p-3 bg-blue-50 rounded-md">
                         <p className="text-sm text-blue-800 font-semibold">
-                            Demo Admin Account:
+                            Demo Accounts:
                         </p>
-                        <p className="text-xs text-blue-700">
-                            Email: admin@test.com
-                        </p>
-                        <p className="text-xs text-blue-700">
-                            Password: admin123
-                        </p>
+                        <div className="mt-1 space-y-1">
+                            <p className="text-xs text-blue-700">
+                                Admin — Email: admin@test.com | Password:
+                                admin123
+                            </p>
+                            <p className="text-xs text-blue-700">
+                                Teacher — Email: teacher@test.com | Password:
+                                teacher123
+                            </p>
+                            <p className="text-xs text-blue-700">
+                                Student — Email: student@test.com | Password:
+                                student123
+                            </p>
+                        </div>
                     </div>
                 </CardContent>
             </Card>

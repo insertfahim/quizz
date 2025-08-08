@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Only students can finish quizzes
+        // Only students can finish quizzes (assignment requirement removed)
         if (user.role !== "student") {
             return NextResponse.json(
                 { error: "Only students are allowed to finish quizzes" },
@@ -28,22 +28,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 { error: "Invalid request" },
                 { status: 400 }
-            );
-        }
-
-        // Verify there is an active assignment to complete
-        const assignment = await prisma.quizAssignment.findFirst({
-            where: {
-                quizId,
-                studentId: user.id,
-                status: { in: ["assigned", "in_progress"] },
-            },
-        });
-
-        if (!assignment) {
-            return NextResponse.json(
-                { error: "No assignment found for this quiz" },
-                { status: 403 }
             );
         }
 
@@ -121,14 +105,7 @@ export async function POST(req: NextRequest) {
                 });
             }
 
-            // Mark assignment completed
-            await tx.quizAssignment.update({
-                where: { id: assignment.id },
-                data: {
-                    status: "completed",
-                    completedAt: new Date(),
-                },
-            });
+            // Assignment updates removed
 
             return { submission };
         });

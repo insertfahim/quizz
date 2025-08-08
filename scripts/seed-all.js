@@ -125,6 +125,54 @@ const quizzes = [
     },
 ];
 
+const DIFFICULTIES = ["Easy", "Medium", "Hard"];
+const MIN_QUESTIONS_PER_LEVEL = 5;
+
+function distributeDifficulties(questions) {
+    if (!Array.isArray(questions) || questions.length === 0) return [];
+    return questions.map((q, idx) => {
+        if (q && q.difficulty) return q;
+        const assigned = DIFFICULTIES[idx % DIFFICULTIES.length];
+        return { ...q, difficulty: assigned };
+    });
+}
+
+function ensureMinPerDifficulty(
+    questions,
+    minPerLevel = MIN_QUESTIONS_PER_LEVEL
+) {
+    const byLevel = {
+        Easy: [],
+        Medium: [],
+        Hard: [],
+    };
+
+    for (const q of questions) {
+        const level = DIFFICULTIES.includes(q.difficulty)
+            ? q.difficulty
+            : "Medium";
+        byLevel[level].push(q);
+    }
+
+    const result = [...questions];
+    for (const level of DIFFICULTIES) {
+        const deficit = Math.max(0, minPerLevel - byLevel[level].length);
+        if (deficit === 0) continue;
+        // Use questions from any pool to create variants for the missing level
+        const sourcePool = result.length > 0 ? result : questions;
+        for (let i = 0; i < deficit; i++) {
+            const base = sourcePool[(i + level.length) % sourcePool.length];
+            // Create a simple variant to avoid exact duplicates
+            result.push({
+                ...base,
+                text: `${base.text} (Practice ${level})`,
+                difficulty: level,
+            });
+        }
+    }
+    return result;
+}
+
 async function main() {
     console.log("🌱 Starting quiz database seeding...");
     console.log("================================================");
@@ -178,7 +226,10 @@ async function main() {
             );
 
             // Seed Questions and Options for this quiz
-            for (const question of quiz.questions) {
+            const questionsWithDifficulties = ensureMinPerDifficulty(
+                distributeDifficulties(quiz.questions)
+            );
+            for (const question of questionsWithDifficulties) {
                 try {
                     const createdQuestion = await prisma.question.create({
                         data: {

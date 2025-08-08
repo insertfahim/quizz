@@ -21,7 +21,7 @@ function page() {
     const router = useRouter();
     const params = useParams();
     const { user, isAdmin, isTeacher, isStudent } = useAuth();
-    const [hasAssignment, setHasAssignment] = useState<boolean>(false);
+    const [hasAssignment, setHasAssignment] = useState<boolean>(true);
     const [allowUnassigned, setAllowUnassigned] = useState<boolean>(false);
 
     const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
@@ -50,24 +50,8 @@ function page() {
             // If no stored quiz, fetch by ID
             fetchQuizById(params.quizId as string);
         }
-        // Check assignment for students
-        const checkAssignment = async () => {
-            if (!isUnassignedForThisQuiz) {
-                try {
-                    const res = await axios.get("/api/user/assignments");
-                    const list = Array.isArray(res.data) ? res.data : [];
-                    const assigned = list.some(
-                        (a: any) => a.quizId === params.quizId
-                    );
-                    setHasAssignment(assigned);
-                } catch (e) {
-                    setHasAssignment(false);
-                }
-            } else {
-                setHasAssignment(true);
-            }
-        };
-        checkAssignment();
+        // Assignment check removed – allow all students to start any quiz
+        setHasAssignment(true);
         setLoading(false);
     }, [params.quizId]);
 
@@ -154,17 +138,9 @@ function page() {
                 return;
             }
 
-            if (!hasAssignment) {
-                toast.error("This quiz is not assigned to you.");
-                return;
-            }
+            // Assignment requirement removed
 
-            // Start quiz attempt in database for assigned flow only
-            if (!allowUnassigned) {
-                await axios.post("/api/user/quiz/start", {
-                    quizId: selectedQuiz.id,
-                });
-            }
+            // Skip starting assignment in DB as assignment logic is removed
 
             // Navigate to quiz page
             router.push("/quiz");

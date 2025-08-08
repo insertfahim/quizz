@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Only students can start quizzes
+        // Only students can start quizzes (assignment requirement removed)
         if (user.role !== "student") {
             return NextResponse.json(
                 { error: "Only students are allowed to start quizzes" },
@@ -41,37 +41,9 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Require an active assignment for this student
-        const assignment = await prisma.quizAssignment.findFirst({
-            where: {
-                quizId,
-                studentId: user.id,
-                status: { in: ["assigned", "in_progress"] },
-            },
-        });
+        // Assignment linkage removed; simply acknowledge the start
 
-        if (!assignment) {
-            return NextResponse.json(
-                { error: "No assignment found for this quiz" },
-                { status: 403 }
-            );
-        }
-
-        // Mark assignment as in_progress and set startedAt if not set
-        await prisma.quizAssignment.update({
-            where: { id: assignment.id },
-            data: {
-                status: "in_progress",
-                startedAt: assignment.startedAt ?? new Date(),
-            },
-        });
-
-        return NextResponse.json({
-            message: "Quiz started successfully",
-            quizId,
-            startTime: new Date(),
-            user: { id: user.id, name: user.name },
-        });
+        return NextResponse.json({ message: "Quiz started", quizId });
     } catch (error) {
         console.error("Error starting quiz:", error);
         return NextResponse.json(

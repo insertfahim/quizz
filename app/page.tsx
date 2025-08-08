@@ -237,7 +237,9 @@ export default function Home() {
                                     <Button
                                         size="lg"
                                         className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold"
-                                        onClick={() => router.push("/quiz")}
+                                        onClick={() =>
+                                            router.push("/#featured")
+                                        }
                                     >
                                         Take Quiz
                                         <BookOpen className="w-5 h-5 ml-2" />

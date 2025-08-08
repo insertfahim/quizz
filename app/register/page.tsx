@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterPage() {
     const [formData, setFormData] = useState({
@@ -32,6 +33,7 @@ export default function RegisterPage() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { checkAuth } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -62,6 +64,9 @@ export default function RegisterPage() {
             });
 
             toast.success("Registration successful!");
+
+            // Ensure global auth state is updated before navigation
+            await checkAuth();
 
             // Redirect based on role
             const user = response.data.user;

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -199,6 +200,26 @@ export default function TasksPage() {
 
     if (userLoading || loading) {
         return <Loader />;
+    }
+
+    if (!user) {
+        return (
+            <div className="max-w-3xl mx-auto px-6 lg:px-8 py-12 text-center">
+                <h1 className="text-2xl font-bold">
+                    Please sign in to manage tasks
+                </h1>
+                <p className="mt-2 text-gray-600">
+                    Sign in to create, track, and manage your daily tasks.
+                </p>
+                <div className="mt-6 flex justify-center">
+                    <Link href="/login">
+                        <Button className="bg-blue-500 hover:bg-blue-600">
+                            Sign In
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+        );
     }
 
     return (

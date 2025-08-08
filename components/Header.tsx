@@ -41,11 +41,15 @@ function Header() {
             icon: <Target className="w-5 h-5" />,
             link: "/",
         },
-        {
-            name: "Tasks",
-            icon: <CheckCircle className="w-5 h-5" />,
-            link: "/tasks",
-        },
+        ...(user
+            ? [
+                  {
+                      name: "Tasks",
+                      icon: <CheckCircle className="w-5 h-5" />,
+                      link: "/tasks",
+                  },
+              ]
+            : []),
         {
             name: "Quizzes",
             icon: <BookOpen className="w-5 h-5" />,
@@ -201,6 +205,15 @@ function Header() {
                                 className="text-gray-500 hover:text-gray-700"
                             >
                                 Logout
+                            </Button>
+                        )}
+                        {!user && !loading && (
+                            <Button
+                                size="sm"
+                                onClick={() => router.push("/login")}
+                                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                            >
+                                Get Started
                             </Button>
                         )}
                     </div>

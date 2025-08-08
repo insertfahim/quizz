@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
         const result = await prisma.$transaction(async (tx) => {
             // Calculate correct answers count
             const correctAnswers = responses.filter(
-                (r: any) => r.isCorrect
+                (r: { isCorrect: boolean }) => r.isCorrect
             ).length;
             const totalQuestions = responses.length;
 
@@ -79,12 +79,18 @@ export async function POST(req: NextRequest) {
 
             // Create QuizAnswer records for each response
             if (responses.length > 0) {
-                const answerData = responses.map((response: any) => ({
-                    submissionId: submission.id,
-                    questionId: response.questionId,
-                    selectedOptionId: response.optionId,
-                    isCorrect: response.isCorrect,
-                }));
+                const answerData = responses.map(
+                    (response: {
+                        questionId: string;
+                        optionId?: string;
+                        isCorrect: boolean;
+                    }) => ({
+                        submissionId: submission.id,
+                        questionId: response.questionId,
+                        selectedOptionId: response.optionId,
+                        isCorrect: response.isCorrect,
+                    })
+                );
 
                 await tx.quizAnswer.createMany({
                     data: answerData,

@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Verify quiz exists and is active
-        const quiz = await prisma.quiz.findUnique({
+        const quiz = await prisma.quiz.findFirst({
             where: { id: quizId, isActive: true },
         });
 

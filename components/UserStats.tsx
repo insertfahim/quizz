@@ -1,10 +1,10 @@
 "use client";
-import { useUser } from "@clerk/nextjs";
 import React from "react";
 import Loader from "./Loader";
 import Image from "next/image";
 import { formatTime } from "@/utils/formatTime";
 import { checkAbc, crosshairs } from "@/utils/Icons";
+import { useAuth } from "@/context/AuthContext";
 import {
     Table,
     TableBody,
@@ -32,9 +32,9 @@ interface UserStatsProps {
 }
 
 function UserStats({ userStats }: UserStatsProps) {
-    const { user, isLoaded } = useUser();
+    const { user, loading } = useAuth();
 
-    if (!isLoaded) {
+    if (loading) {
         return <Loader />;
     }
 
@@ -48,7 +48,7 @@ function UserStats({ userStats }: UserStatsProps) {
             <div className="flex flex-col gap-4">
                 <div className="h-[15rem] px-8 flex items-center justify-center border-2 rounded-xl shadow-[0_.3rem_0_0_rgba(0,0,0,0.1)]">
                     <Image
-                        src={user?.imageUrl || "/user.png"}
+                        src={"/user.png"}
                         alt="Profile Image"
                         width={200}
                         height={200}
@@ -89,7 +89,7 @@ function UserStats({ userStats }: UserStatsProps) {
         <div className="flex flex-col gap-4">
             <div className="h-[15rem] px-8 flex items-center justify-center border-2 rounded-xl shadow-[0_.3rem_0_0_rgba(0,0,0,0.1)]">
                 <Image
-                    src={user?.imageUrl || "/user.png"}
+                    src={"/user.png"}
                     alt="Profile Image"
                     width={200}
                     height={200}
@@ -106,7 +106,9 @@ function UserStats({ userStats }: UserStatsProps) {
 
             <div className="grid grid-cols-3 gap-6 font-semibold">
                 <div className="py-4 px-4 flex flex-col gap-1 border-2 rounded-lg shadow-[0_.3rem_0_0_rgba(0,0,0,0.1)]">
-                    <h2 className="font-bold text-xl">{user?.firstName}</h2>
+                    <h2 className="font-bold text-xl">
+                        {user?.name || "User"}
+                    </h2>
                     <p className="text-gray-400 font-semibold">
                         Recent Attempt
                     </p>

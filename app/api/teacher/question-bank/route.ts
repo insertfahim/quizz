@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
                 explanation,
                 category,
                 isShared,
-                options: options ? JSON.stringify(options) : null,
+                options: options ?? null,
                 correctAnswer,
                 creatorId: user.id,
             },

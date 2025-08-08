@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { IOption, IQuestion, IResponse } from "@/types/types";
 import { flag, next } from "@/utils/Icons";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 function page() {
     const router = useRouter();
+    const { user } = useAuth();
 
     // Local state management
     const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
@@ -163,18 +165,24 @@ function page() {
         // Store quiz responses in localStorage for results page
         localStorage.setItem("quizResponses", JSON.stringify(responses));
 
-        const score = responses.filter((res) => res.isCorrect).length;
+        const total = responses.length;
+        const correct = responses.filter((res) => res.isCorrect).length;
+        const score = total > 0 ? (correct / total) * 100 : 0;
 
         try {
-            const res = await axios.post("/api/user/quiz/finish", {
-                quizId: selectedQuiz.id,
-                score,
-                responses,
-            });
-
-            console.log("Quiz finished:", res.data);
+            if (user) {
+                const res = await axios.post("/api/user/quiz/finish", {
+                    quizId: selectedQuiz.id,
+                    score,
+                    responses,
+                });
+                console.log("Quiz finished:", res.data);
+            } else {
+                toast("Results not saved. Sign in to track your progress.");
+            }
         } catch (error) {
             console.log("Error finishing quiz:", error);
+            toast.error("Failed to save results. They won't be stored.");
         }
 
         router.push("/results");

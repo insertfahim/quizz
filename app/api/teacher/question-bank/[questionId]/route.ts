@@ -35,7 +35,7 @@ export async function PUT(
                 explanation,
                 category,
                 isShared,
-                options: options ? JSON.stringify(options) : null,
+                options: options ?? null,
                 correctAnswer,
             },
         });

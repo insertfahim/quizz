@@ -14,12 +14,14 @@ import {
 } from "@/components/ui/card";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { checkAuth } = useAuth();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -38,6 +40,9 @@ export default function LoginPage() {
             });
 
             toast.success("Login successful!");
+
+            // Ensure global auth state is updated before navigation
+            await checkAuth();
 
             // Redirect based on role
             const user = response.data.user;

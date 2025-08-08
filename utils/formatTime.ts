@@ -1,5 +1,9 @@
-import moment from "moment";
-
-export const formatTime = (date: Date) => {
-  return moment(date).format("Do MMMM YYYY, HH:mm");
+export const formatTime = (date: Date): string => {
+    return new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(date);
 };

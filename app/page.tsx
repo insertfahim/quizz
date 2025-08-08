@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
     const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const { user, isTeacher, isAdmin } = useAuth();
+    const { user, isTeacher, isAdmin, loading: authLoading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -184,7 +184,7 @@ export default function Home() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        {!user ? (
+                        {!authLoading && !user ? (
                             <>
                                 <Button
                                     size="lg"
@@ -203,7 +203,7 @@ export default function Home() {
                                     Explore Quizzes
                                 </Button>
                             </>
-                        ) : (
+                        ) : user ? (
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Button
                                     size="lg"
@@ -222,7 +222,7 @@ export default function Home() {
                                     <BookOpen className="w-5 h-5 ml-2" />
                                 </Button>
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 </div>
             </section>
@@ -352,7 +352,7 @@ export default function Home() {
             )}
 
             {/* CTA Section */}
-            {!user && (
+            {!authLoading && !user && (
                 <section className="py-20 px-6 bg-gradient-to-r from-blue-600 to-purple-600">
                     <div className="max-w-4xl mx-auto text-center text-white">
                         <h2 className="text-4xl font-bold mb-4">
@@ -374,7 +374,7 @@ export default function Home() {
                             <Button
                                 variant="outline"
                                 size="lg"
-                                className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-lg font-semibold"
+                                className="border-white bg-transparent text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-lg font-semibold"
                                 onClick={() => router.push("/login")}
                             >
                                 Login

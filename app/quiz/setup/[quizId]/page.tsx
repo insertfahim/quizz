@@ -14,11 +14,13 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useAuth } from "@/context/AuthContext";
 import { useParams } from "next/navigation";
 
 function page() {
     const router = useRouter();
     const params = useParams();
+    const { user } = useAuth();
 
     const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
     const [quizSetup, setQuizSetup] = useState({
@@ -116,7 +118,13 @@ function page() {
                 JSON.stringify(questionsToUse)
             );
 
-            // Start quiz attempt in database
+            if (!user) {
+                toast("Practicing as guest. Sign in to save your progress.");
+                router.push("/quiz");
+                return;
+            }
+
+            // Start quiz attempt in database for authenticated users
             await axios.post("/api/user/quiz/start", {
                 quizId: selectedQuiz.id,
             });

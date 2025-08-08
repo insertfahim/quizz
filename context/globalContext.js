@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 
 const GlobalContext = React.createContext();
 
 export const GlobalContextProvider = ({ children }) => {
-    const { user, isLoaded } = useUser();
+    // Using local auth endpoint instead of Clerk
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [authUser, setAuthUser] = useState(null);
 
     const [dbUser, setDbUser] = useState(null);
     const [userLoading, setUserLoading] = useState(true);
@@ -19,36 +20,22 @@ export const GlobalContextProvider = ({ children }) => {
     const [filteredQuestions, setFilteredQuestions] = React.useState([]);
 
     useEffect(() => {
-        if (!isLoaded || !user?.emailAddresses[0]?.emailAddress) {
-            setUserLoading(false);
-            return;
-        }
-
-        const registerAndFetchUser = async () => {
+        const bootstrap = async () => {
             try {
                 setUserLoading(true);
-
-                // First register/update user with default role if not specified
-                await axios.post("/api/user/register", {
-                    role: "student", // Default role, can be changed later
-                });
-
-                // Then fetch user data with role information
-                const response = await axios.get("/api/user");
-                setDbUser(response.data);
-
-                console.log("User registered/fetched successfully!");
+                const me = await axios.get("/api/auth/me");
+                setAuthUser(me.data.user);
+                setDbUser(me.data.user);
             } catch (error) {
-                console.error("Error with user setup:", error);
+                setAuthUser(null);
+                setDbUser(null);
             } finally {
                 setUserLoading(false);
+                setIsLoaded(true);
             }
         };
-
-        if (user?.emailAddresses[0]?.emailAddress) {
-            registerAndFetchUser();
-        }
-    }, [user, isLoaded]);
+        bootstrap();
+    }, []);
 
     // Function to update user role
     const updateUserRole = async (newRole) => {

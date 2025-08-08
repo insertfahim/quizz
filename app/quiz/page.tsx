@@ -5,12 +5,19 @@ import { flag, next } from "@/utils/Icons";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 function page() {
     const router = useRouter();
-    const { user, isAdmin } = useAuth();
+    const {
+        user,
+        isAdmin,
+        isTeacher,
+        isStudent,
+        loading: authLoading,
+    } = useAuth();
+    const gateInitialized = useRef(false);
 
     // Local state management
     const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
@@ -25,37 +32,137 @@ function page() {
     const [shuffledQuestions, setShuffledQuestions] = useState<IQuestion[]>([]);
 
     useEffect(() => {
-        // Load quiz data from localStorage
-        const storedQuiz = localStorage.getItem("selectedQuiz");
-        const storedQuizSetup = localStorage.getItem("quizSetup");
-        const storedFilteredQuestions =
-            localStorage.getItem("filteredQuestions");
+        // Guard against double invocation in React Strict Mode
+        if (gateInitialized.current) return;
+        if (authLoading) return; // wait for auth to resolve
 
-        if (!storedQuiz || !storedQuizSetup || !storedFilteredQuestions) {
-            toast.error(
-                "Quiz session not found. Please start from quiz setup."
+        const run = async () => {
+            // Block non-students early and consistently
+            if (isTeacher || isAdmin) {
+                const onceKey = "quizAccessToastShown";
+                const shown = sessionStorage.getItem(onceKey);
+                if (!shown) {
+                    toast.error(
+                        isTeacher
+                            ? "Teachers cannot take quizzes."
+                            : "Admins cannot take quizzes."
+                    );
+                    sessionStorage.setItem(onceKey, "1");
+                }
+                clearSessionAndRedirect();
+                return;
+            }
+
+            // Load quiz data from localStorage
+            const storedQuiz = localStorage.getItem("selectedQuiz");
+            const storedQuizSetup = localStorage.getItem("quizSetup");
+            const storedFilteredQuestions =
+                localStorage.getItem("filteredQuestions");
+
+            if (!storedQuiz || !storedQuizSetup || !storedFilteredQuestions) {
+                if (user) {
+                    const onceKey = "quizAccessToastShown";
+                    const shown = sessionStorage.getItem(onceKey);
+                    if (!shown) {
+                        toast.error(
+                            "Quiz session not found. Please start from quiz setup."
+                        );
+                        sessionStorage.setItem(onceKey, "1");
+                    }
+                }
+                router.push("/");
+                return;
+            }
+
+            let quiz: any;
+            let setup: any;
+            let questions: IQuestion[];
+            try {
+                quiz = JSON.parse(storedQuiz);
+                setup = JSON.parse(storedQuizSetup);
+                questions = JSON.parse(storedFilteredQuestions);
+            } catch (error) {
+                console.error("Error parsing quiz data:", error);
+                toast.error("Invalid quiz data. Please restart the quiz.");
+                router.push("/");
+                return;
+            }
+
+            // Require a signed-in student with an active assignment for this quiz
+            if (!user || !isStudent) {
+                // Prevent duplicate toasts by gating on a one-time flag per mount
+                const onceKey = "quizAccessToastShown";
+                const shown = sessionStorage.getItem(onceKey);
+                if (!shown) {
+                    toast.error(
+                        "Please sign in as a student to take assigned quizzes."
+                    );
+                    sessionStorage.setItem(onceKey, "1");
+                }
+                clearSessionAndRedirect();
+                return;
+            }
+
+            // Allow unassigned flow for featured quizzes when the flag is set by setup
+            const unassignedFlag = localStorage.getItem(
+                "allowUnassignedQuizStart"
             );
-            router.push("/");
-            return;
-        }
-
-        try {
-            const quiz = JSON.parse(storedQuiz);
-            const setup = JSON.parse(storedQuizSetup);
-            const questions = JSON.parse(storedFilteredQuestions);
+            const isUnassignedForThisQuiz = unassignedFlag === quiz.id;
+            if (!isUnassignedForThisQuiz) {
+                try {
+                    const res = await axios.get("/api/user/assignments");
+                    const list = Array.isArray(res.data) ? res.data : [];
+                    const assigned = list.some(
+                        (a: any) =>
+                            a.quizId === quiz.id &&
+                            ["assigned", "in_progress"].includes(a.status)
+                    );
+                    if (!assigned) {
+                        const onceKey = "quizAccessToastShown";
+                        const shown = sessionStorage.getItem(onceKey);
+                        if (!shown) {
+                            toast.error("This quiz is not assigned to you.");
+                            sessionStorage.setItem(onceKey, "1");
+                        }
+                        clearSessionAndRedirect();
+                        return;
+                    }
+                } catch (e) {
+                    const onceKey = "quizAccessToastShown";
+                    const shown = sessionStorage.getItem(onceKey);
+                    if (!shown) {
+                        toast.error(
+                            "Failed to verify assignment. Please start from quiz setup."
+                        );
+                        sessionStorage.setItem(onceKey, "1");
+                    }
+                    clearSessionAndRedirect();
+                    return;
+                }
+            }
 
             setSelectedQuiz(quiz);
             setQuizSetup(setup);
             setFilteredQuestions(questions);
-        } catch (error) {
-            console.error("Error parsing quiz data:", error);
-            toast.error("Invalid quiz data. Please restart the quiz.");
-            router.push("/");
-            return;
-        }
+            setLoading(false);
+            gateInitialized.current = true;
+        };
 
-        setLoading(false);
-    }, [router]);
+        run();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [router, user, authLoading, isTeacher, isAdmin, isStudent]);
+
+    const clearSessionAndRedirect = () => {
+        try {
+            localStorage.removeItem("selectedQuiz");
+            localStorage.removeItem("quizSetup");
+            localStorage.removeItem("filteredQuestions");
+            localStorage.removeItem("allowUnassignedQuizStart");
+        } catch (_) {}
+        router.push("/");
+    };
+
+    // Access verification moved into the single guarded effect above
 
     // Fisher-Yates Shuffle Algorithm - moved before hooks
     const shuffleArray = (array: any[]) => {
@@ -91,12 +198,7 @@ function page() {
         }
     }, [shuffledQuestions, currentIndex]);
 
-    // Block admins from accessing quiz taking page
-    useEffect(() => {
-        if (isAdmin) {
-            toast.error("Admins cannot take quizzes.");
-        }
-    }, [isAdmin]);
+    // Admin access is handled in the guarded effect
 
     // Conditional returns AFTER all hooks
     if (loading) {
@@ -179,7 +281,7 @@ function page() {
             // reset the active question
             setActiveQuestion(null);
         } else {
-            router.push("/quiz/results");
+            router.push("/results");
         }
     };
 
@@ -192,15 +294,23 @@ function page() {
         const score = total > 0 ? (correct / total) * 100 : 0;
 
         try {
-            if (user) {
-                const res = await axios.post("/api/user/quiz/finish", {
-                    quizId: selectedQuiz.id,
-                    score,
-                    responses,
-                });
-                console.log("Quiz finished:", res.data);
-            } else {
-                toast("Results not saved. Sign in to track your progress.");
+            // If this is a featured/unassigned attempt, skip server submission
+            const unassignedFlag = localStorage.getItem(
+                "allowUnassignedQuizStart"
+            );
+            const isUnassignedForThisQuiz = unassignedFlag === selectedQuiz.id;
+
+            if (!isUnassignedForThisQuiz) {
+                if (user) {
+                    const res = await axios.post("/api/user/quiz/finish", {
+                        quizId: selectedQuiz.id,
+                        score,
+                        responses,
+                    });
+                    console.log("Quiz finished:", res.data);
+                } else {
+                    toast("Results not saved. Sign in to track your progress.");
+                }
             }
         } catch (error) {
             console.log("Error finishing quiz:", error);

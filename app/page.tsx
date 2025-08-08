@@ -387,7 +387,7 @@ export default function Home() {
 
             {/* Recent Quizzes Section */}
             {quizzes.length > 0 && (
-                <section className="py-20 px-6">
+                <section id="featured" className="py-20 px-6">
                     <div className="max-w-7xl mx-auto">
                         <div className="flex items-center justify-between mb-12">
                             <div>
@@ -402,7 +402,7 @@ export default function Home() {
                             <Button
                                 variant="outline"
                                 className="hidden md:flex items-center gap-2"
-                                onClick={() => router.push("/quiz")}
+                                onClick={() => router.push("/quizzes")}
                             >
                                 View All Quizzes
                                 <ArrowRight className="w-4 h-4" />
@@ -411,7 +411,11 @@ export default function Home() {
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {quizzes.map((quiz) => (
-                                <QuizCard key={quiz.id} quiz={quiz} />
+                                <QuizCard
+                                    key={quiz.id}
+                                    quiz={quiz}
+                                    allowUnassigned={true}
+                                />
                             ))}
                         </div>
 
@@ -419,7 +423,7 @@ export default function Home() {
                             <Button
                                 variant="outline"
                                 className="w-full"
-                                onClick={() => router.push("/quiz")}
+                                onClick={() => router.push("/quizzes")}
                             >
                                 View All Quizzes
                                 <ArrowRight className="w-4 h-4 ml-2" />

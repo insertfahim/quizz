@@ -13,10 +13,10 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Block admins from submitting/finishing quizzes
-        if (user.role === "admin") {
+        // Only students can finish quizzes
+        if (user.role !== "student") {
             return NextResponse.json(
-                { error: "Admins are not allowed to finish quizzes" },
+                { error: "Only students are allowed to finish quizzes" },
                 { status: 403 }
             );
         }

@@ -21,6 +21,15 @@ function page() {
         const storedResponses = localStorage.getItem("quizResponses");
         const storedQuiz = localStorage.getItem("selectedQuiz");
         const storedQuestions = localStorage.getItem("filteredQuestions");
+        try {
+            // Clean up temporary flag for unassigned featured starts
+            const unassignedFlag = localStorage.getItem(
+                "allowUnassignedQuizStart"
+            );
+            if (unassignedFlag) {
+                localStorage.removeItem("allowUnassignedQuizStart");
+            }
+        } catch (_) {}
 
         if (!storedResponses || !storedQuiz || !storedQuestions) {
             router.push("/");

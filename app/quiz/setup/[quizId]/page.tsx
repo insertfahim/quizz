@@ -20,8 +20,9 @@ import { useParams } from "next/navigation";
 function page() {
     const router = useRouter();
     const params = useParams();
-    const { user, isAdmin } = useAuth();
+    const { user, isAdmin, isTeacher, isStudent } = useAuth();
     const [hasAssignment, setHasAssignment] = useState<boolean>(false);
+    const [allowUnassigned, setAllowUnassigned] = useState<boolean>(false);
 
     const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
     const [quizSetup, setQuizSetup] = useState({
@@ -34,6 +35,10 @@ function page() {
     useEffect(() => {
         // Try to get quiz from localStorage first
         const storedQuiz = localStorage.getItem("selectedQuiz");
+        const unassignedFlag = localStorage.getItem("allowUnassignedQuizStart");
+        const isUnassignedForThisQuiz =
+            unassignedFlag === (params.quizId as string);
+        setAllowUnassigned(Boolean(isUnassignedForThisQuiz));
         if (storedQuiz) {
             const quiz = JSON.parse(storedQuiz);
             setSelectedQuiz(quiz);
@@ -47,15 +52,19 @@ function page() {
         }
         // Check assignment for students
         const checkAssignment = async () => {
-            try {
-                const res = await axios.get("/api/user/assignments");
-                const list = Array.isArray(res.data) ? res.data : [];
-                const assigned = list.some(
-                    (a: any) => a.quizId === params.quizId
-                );
-                setHasAssignment(assigned);
-            } catch (e) {
-                setHasAssignment(false);
+            if (!isUnassignedForThisQuiz) {
+                try {
+                    const res = await axios.get("/api/user/assignments");
+                    const list = Array.isArray(res.data) ? res.data : [];
+                    const assigned = list.some(
+                        (a: any) => a.quizId === params.quizId
+                    );
+                    setHasAssignment(assigned);
+                } catch (e) {
+                    setHasAssignment(false);
+                }
+            } else {
+                setHasAssignment(true);
             }
         };
         checkAssignment();
@@ -133,13 +142,15 @@ function page() {
                 JSON.stringify(questionsToUse)
             );
 
-            if (!user) {
-                toast.error("You must be signed in to take assigned quizzes.");
+            if (!user || !isStudent) {
+                toast.error(
+                    "You must be signed in as a student to take quizzes."
+                );
                 return;
             }
 
-            if (isAdmin) {
-                toast.error("Admins cannot take quizzes.");
+            if (isAdmin || isTeacher) {
+                toast.error("Only students can take quizzes.");
                 return;
             }
 
@@ -148,10 +159,12 @@ function page() {
                 return;
             }
 
-            // Start quiz attempt in database for authenticated users
-            await axios.post("/api/user/quiz/start", {
-                quizId: selectedQuiz.id,
-            });
+            // Start quiz attempt in database for assigned flow only
+            if (!allowUnassigned) {
+                await axios.post("/api/user/quiz/start", {
+                    quizId: selectedQuiz.id,
+                });
+            }
 
             // Navigate to quiz page
             router.push("/quiz");

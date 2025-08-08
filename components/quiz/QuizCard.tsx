@@ -8,18 +8,31 @@ import { useAuth } from "@/context/AuthContext";
 
 interface Props {
     quiz: IQuiz;
+    allowUnassigned?: boolean; // when true, clicking allows unassigned attempt
 }
 
-function QuizCard({ quiz }: Props) {
+function QuizCard({ quiz, allowUnassigned = false }: Props) {
     const router = useRouter();
-    const { isAdmin } = useAuth();
+    const { isAdmin, isTeacher } = useAuth();
 
     const handleClick = () => {
-        if (isAdmin) {
+        if (isAdmin || isTeacher) {
             return;
         }
         // Store quiz data in localStorage for the setup page
         localStorage.setItem("selectedQuiz", JSON.stringify(quiz));
+        if (allowUnassigned) {
+            try {
+                localStorage.setItem("allowUnassignedQuizStart", quiz.id);
+            } catch (_) {}
+        } else {
+            try {
+                const flag = localStorage.getItem("allowUnassignedQuizStart");
+                if (flag === quiz.id) {
+                    localStorage.removeItem("allowUnassignedQuizStart");
+                }
+            } catch (_) {}
+        }
         router.push(`/quiz/setup/${quiz.id}`);
     };
 
@@ -64,9 +77,9 @@ function QuizCard({ quiz }: Props) {
                             </span>
                         </span>
                     </p>
-                    {isAdmin && (
+                    {(isAdmin || isTeacher) && (
                         <span className="text-xs font-semibold text-red-500">
-                            Admins cannot take quizzes
+                            Only students can take quizzes
                         </span>
                     )}
                 </div>

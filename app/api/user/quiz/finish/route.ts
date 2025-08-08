@@ -13,6 +13,14 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Block admins from submitting/finishing quizzes
+        if (user.role === "admin") {
+            return NextResponse.json(
+                { error: "Admins are not allowed to finish quizzes" },
+                { status: 403 }
+            );
+        }
+
         const { quizId, score, responses } = await req.json();
 
         // validate the fields

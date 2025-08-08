@@ -32,12 +32,10 @@ export default function LeaderboardPage() {
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [timeFilter, setTimeFilter] = useState("all");
-    const [categoryFilter, setCategoryFilter] = useState("all");
-    const [categories, setCategories] = useState<string[]>([]);
 
     useEffect(() => {
         fetchLeaderboard();
-    }, [timeFilter, categoryFilter]);
+    }, [timeFilter]);
 
     const fetchLeaderboard = async () => {
         try {
@@ -45,11 +43,9 @@ export default function LeaderboardPage() {
             const response = await axios.get("/api/leaderboard", {
                 params: {
                     timeFilter,
-                    categoryFilter,
                 },
             });
             setLeaderboard(response.data.leaderboard);
-            setCategories(response.data.categories || []);
         } catch (error) {
             console.error("Error fetching leaderboard:", error);
         } finally {
@@ -112,23 +108,6 @@ export default function LeaderboardPage() {
                         <SelectItem value="week">This Week</SelectItem>
                         <SelectItem value="month">This Month</SelectItem>
                         <SelectItem value="today">Today</SelectItem>
-                    </SelectContent>
-                </Select>
-
-                <Select
-                    value={categoryFilter}
-                    onValueChange={setCategoryFilter}
-                >
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Categories</SelectItem>
-                        {categories.map((category) => (
-                            <SelectItem key={category} value={category}>
-                                {category}
-                            </SelectItem>
-                        ))}
                     </SelectContent>
                 </Select>
             </div>

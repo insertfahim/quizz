@@ -4,6 +4,7 @@ import { dots } from "@/utils/Icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { useAuth } from "@/context/AuthContext";
 
 interface Props {
     quiz: IQuiz;
@@ -11,8 +12,12 @@ interface Props {
 
 function QuizCard({ quiz }: Props) {
     const router = useRouter();
+    const { isAdmin } = useAuth();
 
     const handleClick = () => {
+        if (isAdmin) {
+            return;
+        }
         // Store quiz data in localStorage for the setup page
         localStorage.setItem("selectedQuiz", JSON.stringify(quiz));
         router.push(`/quiz/setup/${quiz.id}`);
@@ -59,6 +64,11 @@ function QuizCard({ quiz }: Props) {
                             </span>
                         </span>
                     </p>
+                    {isAdmin && (
+                        <span className="text-xs font-semibold text-red-500">
+                            Admins cannot take quizzes
+                        </span>
+                    )}
                 </div>
             </div>
         </div>

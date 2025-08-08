@@ -213,14 +213,16 @@ export default function Home() {
                                     My Tasks
                                     <Calendar className="w-5 h-5 ml-2" />
                                 </Button>
-                                <Button
-                                    size="lg"
-                                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold"
-                                    onClick={() => router.push("/quiz")}
-                                >
-                                    Take Quiz
-                                    <BookOpen className="w-5 h-5 ml-2" />
-                                </Button>
+                                {!isAdmin && (
+                                    <Button
+                                        size="lg"
+                                        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold"
+                                        onClick={() => router.push("/quiz")}
+                                    >
+                                        Take Quiz
+                                        <BookOpen className="w-5 h-5 ml-2" />
+                                    </Button>
+                                )}
                             </div>
                         ) : null}
                     </div>

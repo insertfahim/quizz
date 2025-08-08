@@ -20,7 +20,7 @@ import { useParams } from "next/navigation";
 function page() {
     const router = useRouter();
     const params = useParams();
-    const { user } = useAuth();
+    const { user, isAdmin } = useAuth();
 
     const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
     const [quizSetup, setQuizSetup] = useState({
@@ -121,6 +121,11 @@ function page() {
             if (!user) {
                 toast("Practicing as guest. Sign in to save your progress.");
                 router.push("/quiz");
+                return;
+            }
+
+            if (isAdmin) {
+                toast.error("Admins cannot take quizzes.");
                 return;
             }
 

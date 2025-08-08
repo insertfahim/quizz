@@ -14,6 +14,14 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Block admins from starting quizzes
+        if (user.role === "admin") {
+            return NextResponse.json(
+                { error: "Admins are not allowed to start quizzes" },
+                { status: 403 }
+            );
+        }
+
         if (!quizId) {
             return NextResponse.json(
                 { error: "Quiz ID is required" },

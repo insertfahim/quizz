@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 
 function page() {
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, isAdmin } = useAuth();
 
     // Local state management
     const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
@@ -91,11 +91,33 @@ function page() {
         }
     }, [shuffledQuestions, currentIndex]);
 
+    // Block admins from accessing quiz taking page
+    useEffect(() => {
+        if (isAdmin) {
+            toast.error("Admins cannot take quizzes.");
+        }
+    }, [isAdmin]);
+
     // Conditional returns AFTER all hooks
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (isAdmin) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-600">
+                        Access Restricted
+                    </h2>
+                    <p className="text-gray-500 mt-2">
+                        Admins are not allowed to take quizzes.
+                    </p>
+                </div>
             </div>
         );
     }

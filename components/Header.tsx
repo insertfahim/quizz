@@ -50,11 +50,15 @@ function Header() {
                   },
               ]
             : []),
-        {
-            name: "Quizzes",
-            icon: <BookOpen className="w-5 h-5" />,
-            link: "/quiz",
-        },
+        ...(isAdmin
+            ? []
+            : [
+                  {
+                      name: "Quizzes",
+                      icon: <BookOpen className="w-5 h-5" />,
+                      link: "/quiz",
+                  },
+              ]),
         {
             name: "Leaderboard",
             icon: <Trophy className="w-5 h-5" />,

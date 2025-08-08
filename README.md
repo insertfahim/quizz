@@ -229,17 +229,17 @@ Mermaid flow – Middleware
 
 ```mermaid
 flowchart TD
-  A[Request] --> B{Public Route?}
-  B -- Yes --> C[Allow]
-  B -- No --> D[getCurrentUser(req)]
-  D -- No User --> E[Redirect /login]
-  D -- User --> F{Admin/Teacher Path?}
-  F -- Admin Path --> G{user.role === admin}
-  G -- true --> C
-  G -- false --> H[Redirect /]
-  F -- Teacher Path --> I{role teacher or admin}
-  I -- true --> C
-  I -- false --> H
+  A[Request] --> B{Public route?}
+  B -->|Yes| C[Allow]
+  B -->|No| D[Resolve user (getCurrentUser)]
+  D -->|No user| E[Redirect to /login]
+  D -->|User| F{Admin/Teacher path?}
+  F -->|Admin path| G{Role is admin?}
+  G -->|Yes| C
+  G -->|No| H[Redirect to /]
+  F -->|Teacher path| I{Role is teacher or admin?}
+  I -->|Yes| C
+  I -->|No| H
 ```
 
 ## 5) Data Model (Prisma, MongoDB)

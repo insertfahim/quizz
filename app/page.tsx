@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { IQuiz } from "@/types/types";
+import { IQuiz, IAssignment } from "@/types/types";
 import QuizCard from "@/components/quiz/QuizCard";
 import axios from "axios";
 import Loader from "@/components/Loader";
@@ -27,13 +27,33 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
     const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
+    const [assignments, setAssignments] = useState<IAssignment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const { user, isTeacher, isAdmin, loading: authLoading } = useAuth();
+    const {
+        user,
+        isTeacher,
+        isAdmin,
+        isStudent,
+        loading: authLoading,
+    } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
         fetchQuizzes();
     }, []);
+
+    useEffect(() => {
+        const fetchAssignments = async () => {
+            if (!isStudent) return;
+            try {
+                const res = await axios.get("/api/user/assignments");
+                setAssignments(res.data);
+            } catch (e) {
+                // ignore
+            }
+        };
+        fetchAssignments();
+    }, [isStudent]);
 
     const fetchQuizzes = async () => {
         try {
@@ -264,6 +284,62 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+
+            {/* Assigned to you */}
+            {isStudent && assignments.length > 0 && (
+                <section className="py-10 px-6">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-3xl font-bold">
+                                Assigned to you
+                            </h2>
+                            <Button
+                                variant="outline"
+                                onClick={() => router.push("/tasks")}
+                            >
+                                View tasks
+                            </Button>
+                        </div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {assignments.slice(0, 6).map((a) => (
+                                <div
+                                    key={a.id}
+                                    className="bg-white rounded-xl shadow border p-5"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="font-semibold text-gray-900">
+                                            {a.quiz?.title || "Quiz"}
+                                        </div>
+                                        <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-600">
+                                            {a.status}
+                                        </span>
+                                    </div>
+                                    {a.dueDate && (
+                                        <div className="text-xs text-gray-500 mt-1">
+                                            Due:{" "}
+                                            {new Date(
+                                                a.dueDate
+                                            ).toLocaleDateString()}
+                                        </div>
+                                    )}
+                                    <div className="mt-4">
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                router.push(
+                                                    `/quiz/setup/${a.quizId}`
+                                                )
+                                            }
+                                        >
+                                            Start
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* User Roles Section */}
             <section className="py-20 px-6 bg-gray-50">

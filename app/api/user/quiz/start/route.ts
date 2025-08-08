@@ -41,6 +41,31 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Require an active assignment for this student
+        const assignment = await prisma.quizAssignment.findFirst({
+            where: {
+                quizId,
+                studentId: user.id,
+                status: { in: ["assigned", "in_progress"] },
+            },
+        });
+
+        if (!assignment) {
+            return NextResponse.json(
+                { error: "No assignment found for this quiz" },
+                { status: 403 }
+            );
+        }
+
+        // Mark assignment as in_progress and set startedAt if not set
+        await prisma.quizAssignment.update({
+            where: { id: assignment.id },
+            data: {
+                status: "in_progress",
+                startedAt: assignment.startedAt ?? new Date(),
+            },
+        });
+
         return NextResponse.json({
             message: "Quiz started successfully",
             quizId,

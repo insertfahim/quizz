@@ -21,10 +21,11 @@ function page() {
     const router = useRouter();
     const params = useParams();
     const { user, isAdmin } = useAuth();
+    const [hasAssignment, setHasAssignment] = useState<boolean>(false);
 
     const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
     const [quizSetup, setQuizSetup] = useState({
-        questionCount: 10,
+        questionCount: 1,
         difficulty: "unspecified",
     });
     const [filteredQuestions, setFilteredQuestions] = useState<any[]>([]);
@@ -38,12 +39,26 @@ function page() {
             setSelectedQuiz(quiz);
             setQuizSetup((prev) => ({
                 ...prev,
-                questionCount: Math.min(10, quiz.questions?.length || 1),
+                questionCount: quiz.questions?.length || 1,
             }));
         } else {
             // If no stored quiz, fetch by ID
             fetchQuizById(params.quizId as string);
         }
+        // Check assignment for students
+        const checkAssignment = async () => {
+            try {
+                const res = await axios.get("/api/user/assignments");
+                const list = Array.isArray(res.data) ? res.data : [];
+                const assigned = list.some(
+                    (a: any) => a.quizId === params.quizId
+                );
+                setHasAssignment(assigned);
+            } catch (e) {
+                setHasAssignment(false);
+            }
+        };
+        checkAssignment();
         setLoading(false);
     }, [params.quizId]);
 
@@ -55,7 +70,7 @@ function page() {
             localStorage.setItem("selectedQuiz", JSON.stringify(quiz));
             setQuizSetup((prev) => ({
                 ...prev,
-                questionCount: Math.min(10, quiz.questions?.length || 1),
+                questionCount: quiz.questions?.length || 1,
             }));
         } catch (error) {
             console.error("Error fetching quiz:", error);
@@ -119,13 +134,17 @@ function page() {
             );
 
             if (!user) {
-                toast("Practicing as guest. Sign in to save your progress.");
-                router.push("/quiz");
+                toast.error("You must be signed in to take assigned quizzes.");
                 return;
             }
 
             if (isAdmin) {
                 toast.error("Admins cannot take quizzes.");
+                return;
+            }
+
+            if (!hasAssignment) {
+                toast.error("This quiz is not assigned to you.");
                 return;
             }
 

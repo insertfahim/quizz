@@ -28,6 +28,10 @@ model User {
   updatedAt     DateTime @updatedAt
   createdQuizzes Quiz[]  @relation("QuizCreator")
   submissions   QuizSubmission[]
+  // Student side of quiz assignments
+  assignedAssignments QuizAssignment[] @relation("StudentAssignments")
+  // Teacher/admin who assigned quizzes
+  givenAssignments    QuizAssignment[] @relation("AssignedByRelations")
   tasks         Task[]
   notifications Notification[]
   questionBanks QuestionBank[]
@@ -49,6 +53,7 @@ model Quiz {
   creator         User?     @relation("QuizCreator", fields: [creatorId], references: [id])
   questions       Question[]
   submissions     QuizSubmission[]
+  assignments     QuizAssignment[]
 }
 
 model Question{
@@ -101,6 +106,24 @@ model QuizAnswer {
   selectedOption   Option? @relation(fields: [selectedOptionId], references: [id])
   textAnswer    String?  // For short answer questions
   isCorrect     Boolean
+}
+
+// Quiz assignments from teacher to student
+model QuizAssignment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  quizId        String   @db.ObjectId
+  quiz          Quiz     @relation(fields: [quizId], references: [id])
+  studentId     String   @db.ObjectId
+  student       User     @relation("StudentAssignments", fields: [studentId], references: [id])
+  assignedById  String   @db.ObjectId
+  assignedBy    User     @relation("AssignedByRelations", fields: [assignedById], references: [id])
+  status        String   @default("assigned") // assigned, in_progress, completed
+  dueDate       DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([studentId, quizId])
 }
 
 // Task Planner Models

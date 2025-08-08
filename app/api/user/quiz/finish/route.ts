@@ -31,6 +31,22 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Verify there is an active assignment to complete
+        const assignment = await prisma.quizAssignment.findFirst({
+            where: {
+                quizId,
+                studentId: user.id,
+                status: { in: ["assigned", "in_progress"] },
+            },
+        });
+
+        if (!assignment) {
+            return NextResponse.json(
+                { error: "No assignment found for this quiz" },
+                { status: 403 }
+            );
+        }
+
         // Use transaction for atomic operations
         const result = await prisma.$transaction(async (tx) => {
             // Calculate correct answers count
@@ -104,6 +120,15 @@ export async function POST(req: NextRequest) {
                     data: answerData,
                 });
             }
+
+            // Mark assignment completed
+            await tx.quizAssignment.update({
+                where: { id: assignment.id },
+                data: {
+                    status: "completed",
+                    completedAt: new Date(),
+                },
+            });
 
             return { submission };
         });

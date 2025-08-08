@@ -100,6 +100,20 @@ interface IAuditLog {
     createdAt: string;
 }
 
+interface IAssignmentQuizLite {
+    title: string;
+    questions: Array<{ id: string }>;
+}
+
+interface IAssignment {
+    id: string;
+    quizId: string;
+    status: string;
+    dueDate?: string | null;
+    createdAt: string;
+    quiz?: IAssignmentQuizLite;
+}
+
 export type {
     IQuiz,
     IQuestion,
@@ -109,4 +123,5 @@ export type {
     IUser,
     ISubmission,
     IAuditLog,
+    IAssignment,
 };

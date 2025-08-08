@@ -64,6 +64,13 @@ interface UserListResponse {
     };
 }
 
+interface NewUserForm {
+    name: string;
+    email: string;
+    role: string;
+    password: string;
+}
+
 export default function AdminUsersPage() {
     const { isAdmin, loading } = useAuth();
     const router = useRouter();
@@ -76,6 +83,14 @@ export default function AdminUsersPage() {
     const [totalUsers, setTotalUsers] = useState(0);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [newUserForm, setNewUserForm] = useState<NewUserForm>({
+        name: "",
+        email: "",
+        role: "student",
+        password: "",
+    });
 
     useEffect(() => {
         if (!loading && !isAdmin) {
@@ -125,6 +140,35 @@ export default function AdminUsersPage() {
     const handleEditUser = (user: User) => {
         setSelectedUser(user);
         setIsEditModalOpen(true);
+    };
+
+    const handleCreateUser = async () => {
+        try {
+            setIsSubmitting(true);
+            await axios.post(`/api/admin/users`, {
+                name: newUserForm.name,
+                email: newUserForm.email,
+                role: newUserForm.role,
+                password: newUserForm.password,
+            });
+            toast.success("User created successfully");
+            setIsCreateModalOpen(false);
+            setNewUserForm({
+                name: "",
+                email: "",
+                role: "student",
+                password: "",
+            });
+            await fetchUsers();
+        } catch (error: any) {
+            console.error("Error creating user:", error);
+            const message =
+                (error?.response?.data?.error as string) ||
+                "Failed to create user";
+            toast.error(message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleUpdateUser = async (userId: string, updates: Partial<User>) => {
@@ -210,7 +254,7 @@ export default function AdminUsersPage() {
                         Manage user accounts, roles, and permissions
                     </p>
                 </div>
-                <Button>
+                <Button onClick={() => setIsCreateModalOpen(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Add User
                 </Button>
@@ -493,6 +537,117 @@ export default function AdminUsersPage() {
                                 onClick={() => {
                                     setIsEditModalOpen(false);
                                     setSelectedUser(null);
+                                }}
+                                className="flex-1"
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Create User Modal */}
+            {isCreateModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                        <h3 className="text-lg font-bold mb-4">Add User</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <Label htmlFor="create-name">Name</Label>
+                                <Input
+                                    id="create-name"
+                                    value={newUserForm.name}
+                                    onChange={(e) =>
+                                        setNewUserForm({
+                                            ...newUserForm,
+                                            name: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="create-email">Email</Label>
+                                <Input
+                                    id="create-email"
+                                    type="email"
+                                    value={newUserForm.email}
+                                    onChange={(e) =>
+                                        setNewUserForm({
+                                            ...newUserForm,
+                                            email: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="create-role">Role</Label>
+                                <Select
+                                    value={newUserForm.role}
+                                    onValueChange={(value) =>
+                                        setNewUserForm({
+                                            ...newUserForm,
+                                            role: value,
+                                        })
+                                    }
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="student">
+                                            Student
+                                        </SelectItem>
+                                        <SelectItem value="teacher">
+                                            Teacher
+                                        </SelectItem>
+                                        <SelectItem value="admin">
+                                            Admin
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label htmlFor="create-password">
+                                    Password
+                                </Label>
+                                <Input
+                                    id="create-password"
+                                    type="password"
+                                    value={newUserForm.password}
+                                    onChange={(e) =>
+                                        setNewUserForm({
+                                            ...newUserForm,
+                                            password: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div className="flex gap-2 mt-6">
+                            <Button
+                                onClick={handleCreateUser}
+                                className="flex-1"
+                                disabled={
+                                    isSubmitting ||
+                                    !newUserForm.name ||
+                                    !newUserForm.email ||
+                                    !newUserForm.password ||
+                                    !newUserForm.role
+                                }
+                            >
+                                {isSubmitting ? "Creating..." : "Create User"}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setIsCreateModalOpen(false);
+                                    setNewUserForm({
+                                        name: "",
+                                        email: "",
+                                        role: "student",
+                                        password: "",
+                                    });
                                 }}
                                 className="flex-1"
                             >
